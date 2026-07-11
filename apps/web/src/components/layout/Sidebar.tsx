@@ -17,6 +17,15 @@ export default function Sidebar() {
 
       <p><Link to="/" style={{color:"white"}}>Dashboard</Link></p>
 
+      <p>
+    <Link
+        to="/intake"
+        style={{ color: "white" }}
+    >
+        Property Intake
+    </Link>
+</p>
+
       <p><Link to="/properties" style={{color:"white"}}>Properties</Link></p>
 
       <p><Link to="/settings" style={{color:"white"}}>Settings</Link></p>

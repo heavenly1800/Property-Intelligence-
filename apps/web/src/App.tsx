@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
+import  Intake  from "./pages/Intake";
 import Settings from "./pages/Settings";
+
 
 export default function App() {
   return (
@@ -23,6 +25,11 @@ export default function App() {
           path="/properties/:id"
           element={<PropertyDetail />}
         />
+
+        <Route
+    path="/intake"
+    element={<Intake />}
+/>
 
         <Route
           path="/settings"

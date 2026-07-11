@@ -1,5 +1,5 @@
 import { api } from "../lib/api";
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 
 export function getProperties() {
   return api<Property[]>("/properties");

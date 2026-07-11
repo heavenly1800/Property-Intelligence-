@@ -6,7 +6,7 @@ import PropertyList from "../components/property/PropertyList";
 import PropertySearch from "../components/property/PropertySearch";
 
 import { getProperties } from "../services/propertyService";
-import { Property } from "../types/property";
+import type { Property } from "../types/property";
 
 export default function Properties() {
   const [properties, setProperties] = useState<Property[]>([]);

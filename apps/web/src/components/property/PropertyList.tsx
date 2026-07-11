@@ -1,5 +1,5 @@
 import PropertyCard from "./PropertyCard";
-import { Property } from "../../types/property";
+import type { Property } from "../../types/property";
 
 type Props = {
   properties: Property[];
