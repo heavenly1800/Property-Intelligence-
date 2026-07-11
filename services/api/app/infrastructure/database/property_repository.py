@@ -2,10 +2,12 @@ from app.infrastructure.database.supabase import supabase
 
 
 class PropertyRepository:
+    TABLE = "properties"
+
     @staticmethod
     def get_all():
         return (
-            supabase.table("properties")
+            supabase.table(PropertyRepository.TABLE)
             .select("*")
             .execute()
             .data
@@ -14,7 +16,7 @@ class PropertyRepository:
     @staticmethod
     def get(property_id: str):
         results = (
-            supabase.table("properties")
+            supabase.table(PropertyRepository.TABLE)
             .select("*")
             .eq("property_id", property_id)
             .execute()
@@ -25,9 +27,21 @@ class PropertyRepository:
 
     @staticmethod
     def create(data: dict):
-        return (
-            supabase.table("properties")
+        result = (
+            supabase.table(PropertyRepository.TABLE)
             .insert(data)
             .execute()
-            .data
         )
+
+        return result.data
+
+    @staticmethod
+    def update(property_id: str, data: dict):
+        result = (
+            supabase.table(PropertyRepository.TABLE)
+            .update(data)
+            .eq("property_id", property_id)
+            .execute()
+        )
+
+        return result.data

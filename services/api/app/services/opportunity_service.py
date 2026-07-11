@@ -4,16 +4,18 @@ from app.models.opportunity import Opportunity
 class OpportunityService:
 
     @staticmethod
-    def analyze(property_data):
+    def analyze(property_data: dict):
 
         score = 50
 
-        if property_data.property_type == "Vacant Land":
+        property_type = property_data.get("property_type", "")
+
+        if property_type == "Vacant Land":
             score += 30
 
         strategy = (
             "Wholesale"
-            if property_data.property_type == "Vacant Land"
+            if property_type == "Vacant Land"
             else "Buy & Hold"
         )
 
@@ -22,7 +24,7 @@ class OpportunityService:
         next_action = "Research Owner"
 
         return Opportunity(
-            property_id=property_data.property_id,
+            property_id=property_data.get("property_id"),
             score=score,
             strategy=strategy,
             confidence=confidence,

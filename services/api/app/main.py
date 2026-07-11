@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.routers.buyers import router as buyers_router
 from app.routers.properties import router as property_router
 from app.routers.opportunities import router as opportunity_router
 from app.routers.intake import router as intake_router
+from app.routers.research import router as research_router
+from app.routers.decision import router as decision_router
 
 app = FastAPI(
     title="Property Intelligence API",
@@ -41,3 +43,5 @@ async def health():
 app.include_router(property_router)
 app.include_router(opportunity_router)
 app.include_router(intake_router)
+app.include_router(research_router)
+app.include_router(decision_router)
