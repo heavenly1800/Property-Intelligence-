@@ -8,21 +8,19 @@ export default function BuyerMatchesCard({
   buyers,
 }: Props) {
   return (
-    <section className="rounded-lg border bg-white p-6 shadow-sm">
-      <h2 className="mb-6 text-xl font-semibold">
-        Buyer Matches
-      </h2>
+    <section className="buyer-matches-card">
+      <h2>Buyer Matches</h2>
 
       {buyers.length === 0 ? (
-        <p className="text-gray-500">
+        <p className="empty-buyer-state">
           Click "Find Buyers" to search for matching investors.
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className="buyer-list">
           {buyers.map((buyer) => (
             <div
               key={buyer.buyer_name}
-              className="rounded border p-4"
+              className="buyer-match"
             >
               <h3 className="font-semibold">
                 {buyer.buyer_name}
@@ -36,7 +34,7 @@ export default function BuyerMatchesCard({
                 Confidence: {buyer.confidence}%
               </p>
 
-              <ul className="mt-2 list-disc pl-5 text-sm">
+              <ul>
                 {buyer.reasons.map((reason) => (
                   <li key={reason}>{reason}</li>
                 ))}

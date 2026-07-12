@@ -1,3 +1,5 @@
+import type { BackendWorkflow } from "../services/workflowService";
+
 export type Property = {
   property_id: string;
 
@@ -29,4 +31,8 @@ export type Property = {
 
   latitude?: number;
   longitude?: number;
+  research_completed?: boolean;
+  buyer_count?: number;
+  offer_amount?: number;
+  workflow?: BackendWorkflow;
 };

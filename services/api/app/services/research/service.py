@@ -1,6 +1,10 @@
 from app.infrastructure.database.property_repository import PropertyRepository
-from app.services.research.orchestrator import ResearchOrchestrator
+from app.services.research.orchestrator import ResearchAggregator
 from app.services.research.providers.census_provider import CensusProvider
+from app.services.research.providers.county_gis_provider import CountyGISProvider
+from app.services.research.providers.fema_provider import FEMAProvider
+from app.services.research.providers.tax_assessor_provider import TaxAssessorProvider
+from app.services.research.providers.utilities_provider import UtilitiesProvider
 
 
 class ResearchService:
@@ -11,21 +15,27 @@ class ResearchService:
         if not property_data:
             return None
 
-        orchestrator = ResearchOrchestrator(
+        aggregator = ResearchAggregator(
             providers=[
                 CensusProvider(),
+                FEMAProvider(),
+                CountyGISProvider(),
+                TaxAssessorProvider(),
+                UtilitiesProvider(),
             ]
         )
 
-        result = await orchestrator.run(property_data)
+        result = await aggregator.execute(property_data)
 
-        PropertyRepository.update(
-            property_id,
-            {
-                "address": result.address or property_data["address"],
-                "latitude": result.latitude,
-                "longitude": result.longitude,
-            },
-        )
+        research_data = {
+            key: value
+            for provider in result.providers
+            if provider.status.value == "completed"
+            for key, value in provider.data.items()
+            if key in {"latitude", "longitude"}
+        }
 
-        return PropertyRepository.get(property_id)
+        if research_data:
+            PropertyRepository.update(property_id, research_data)
+
+        return result

@@ -2,11 +2,10 @@ import { api } from "../lib/api";
 import { endpoints } from "../lib/endpoints";
 
 export interface Buyer {
-    id: string;
-    name: string;
-    city: string;
-    state: string;
-    last_purchase_price?: number;
+    buyer_name: string;
+    purchase_count: number;
+    confidence: number;
+    reasons: string[];
 }
 
 export interface BuyerResponse {

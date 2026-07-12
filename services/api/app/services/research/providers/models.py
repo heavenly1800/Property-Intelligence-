@@ -1,32 +1,29 @@
-from typing import Optional
+from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class ResearchResult(BaseModel):
-    # Location
-    address: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+class ResearchProviderStatus(str, Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
 
-    county: Optional[str] = None
-    state: Optional[str] = None
 
-    # Parcel
-    apn: Optional[str] = None
-    zoning: Optional[str] = None
-    acreage: Optional[float] = None
-
-    # Ownership
-    owner_name: Optional[str] = None
-
-    # Environmental
-    flood_zone: Optional[str] = None
-
-    # Infrastructure
-    utilities_available: Optional[bool] = None
-
-    # Research Metadata
+class ResearchProviderResult(BaseModel):
+    provider: str
+    status: ResearchProviderStatus
+    data: dict[str, Any] = Field(default_factory=dict)
+    message: str | None = None
     confidence: float = 0.0
 
-    provider_status: dict[str, str] = Field(default_factory=dict)
+
+class ResearchResult(BaseModel):
+    providers: list[ResearchProviderResult] = Field(default_factory=list)
+    completed_providers: list[str] = Field(default_factory=list)
+    failed_providers: list[str] = Field(default_factory=list)
+    progress: int = 0
+    completed: bool = False
+    confidence: float = 0.0

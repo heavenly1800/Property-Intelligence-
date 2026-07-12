@@ -1,68 +1,60 @@
-import React from "react";
-
-export type DecisionAction =
-  | "research"
-  | "buyers"
-  | "offer"
-  | "complete";
+import type { WorkflowState } from "../../services/workflowService";
+import type { DecisionResult } from "../../models/decision";
 
 interface DecisionPanelProps {
-  action: DecisionAction;
-  title: string;
-  description: string;
-  buttonLabel?: string;
+  decision: DecisionResult;
+  workflow: WorkflowState;
   loading?: boolean;
   onAction?: () => void;
 }
 
 export default function DecisionPanel({
-  action,
-  title,
-  description,
-  buttonLabel,
+  decision,
+  workflow,
   loading = false,
   onAction,
 }: DecisionPanelProps) {
   const color =
-    action === "research"
+    workflow.nextAction === "research"
       ? "bg-blue-600"
-      : action === "buyers"
+      : workflow.nextAction === "buyers"
       ? "bg-green-600"
-      : action === "offer"
+      : workflow.nextAction === "offer"
       ? "bg-purple-600"
       : "bg-gray-700";
 
   return (
-    <section className="rounded-lg border bg-white p-6 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="command-card decision-panel">
+      <div className="decision-heading">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-            Decision Engine
-          </p>
+          <p className="eyebrow">Decision Engine</p>
 
-          <h2 className="mt-1 text-2xl font-semibold">
-            {title}
-          </h2>
+          <h2>{decision.nextAction}</h2>
         </div>
 
         <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold text-white ${color}`}
+          className={`decision-status ${color}`}
         >
-          {action.toUpperCase()}
+          {workflow.stage.toUpperCase()}
         </span>
       </div>
 
-      <p className="mb-6 text-gray-600">
-        {description}
-      </p>
+      <p className="decision-description">{workflow.description}</p>
 
-      {buttonLabel && onAction && (
+      <div className="decision-evidence">
+        <span>Score {decision.score}</span>
+        <span>Confidence {decision.confidence}%</span>
+        {decision.reasons.slice(0, 2).map((reason) => <p key={reason}>{reason}</p>)}
+        {decision.risks.slice(0, 1).map((risk) => <p className="decision-risk" key={risk}>{risk}</p>)}
+      </div>
+
+      {workflow.canExecuteAction && onAction && (
         <button
           onClick={onAction}
           disabled={loading}
-          className={`${color} rounded-md px-5 py-2 font-medium text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50`}
+          className={`decision-button ${color}`}
         >
-          {loading ? "Working..." : buttonLabel}
+          {loading ? "Working..." : workflow.nextActionLabel}
         </button>
       )}
     </section>

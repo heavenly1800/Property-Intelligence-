@@ -3,16 +3,23 @@ from typing import Any
 import httpx
 
 from .base import ResearchProvider
+from .models import ResearchProviderResult, ResearchProviderStatus
 
 
 class CensusProvider(ResearchProvider):
     BASE_URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
 
-    async def research(self, property_data: dict[str, Any]) -> dict[str, Any]:
+    async def execute(
+        self, property_data: dict[str, Any]
+    ) -> ResearchProviderResult:
         address = property_data.get("address")
 
         if not address:
-            return {}
+            return ResearchProviderResult(
+                provider="Census",
+                status=ResearchProviderStatus.SKIPPED,
+                message="Property address is unavailable.",
+            )
 
         try:
             async with httpx.AsyncClient(timeout=15) as client:
@@ -30,21 +37,28 @@ class CensusProvider(ResearchProvider):
             matches = response.json()["result"]["addressMatches"]
 
             if not matches:
-                return {
-                    "research_status": "No Census match found."
-                }
+                return ResearchProviderResult(
+                    provider="Census",
+                    status=ResearchProviderStatus.FAILED,
+                    message="No Census address match found.",
+                )
 
             match = matches[0]
 
-            return {
-                "research_status": "Success",
-                "matched_address": match["matchedAddress"],
-                "latitude": match["coordinates"]["y"],
-                "longitude": match["coordinates"]["x"],
-            }
+            return ResearchProviderResult(
+                provider="Census",
+                status=ResearchProviderStatus.COMPLETED,
+                confidence=0.9,
+                data={
+                    "matched_address": match["matchedAddress"],
+                    "latitude": match["coordinates"]["y"],
+                    "longitude": match["coordinates"]["x"],
+                },
+            )
 
         except Exception as e:
-            return {
-                "research_status": "Failed",
-                "research_error": str(e),
-            }
+            return ResearchProviderResult(
+                provider="Census",
+                status=ResearchProviderStatus.FAILED,
+                message=str(e),
+            )

@@ -1,40 +1,55 @@
 from typing import Any
 
 from .providers.base import ResearchProvider
-from .providers.models import ResearchResult
+from .providers.models import (
+    ResearchProviderResult,
+    ResearchProviderStatus,
+    ResearchResult,
+)
 
 
-class ResearchOrchestrator:
+class ResearchAggregator:
     def __init__(self, providers: list[ResearchProvider]):
         self.providers = providers
 
-    async def run(
-        self,
-        property_data: dict[str, Any],
-    ) -> ResearchResult:
-        result = ResearchResult()
-
-        provider_status: dict[str, str] = {}
+    async def execute(self, property_data: dict[str, Any]) -> ResearchResult:
+        results: list[ResearchProviderResult] = []
 
         for provider in self.providers:
-            provider_name = provider.__class__.__name__
-
             try:
-                provider_result = await provider.research(property_data)
-
-                status = provider_result.pop(
-                    "research_status",
-                    "Success",
+                results.append(await provider.execute(property_data))
+            except Exception as error:
+                results.append(
+                    ResearchProviderResult(
+                        provider=provider.__class__.__name__.removesuffix("Provider"),
+                        status=ResearchProviderStatus.FAILED,
+                        message=str(error),
+                    )
                 )
 
-                provider_status[provider_name] = status
+        completed = [
+            result.provider for result in results
+            if result.status == ResearchProviderStatus.COMPLETED
+        ]
+        failed = [
+            result.provider for result in results
+            if result.status == ResearchProviderStatus.FAILED
+        ]
+        confidence_values = [
+            result.confidence for result in results
+            if result.status == ResearchProviderStatus.COMPLETED
+        ]
+        terminal = {
+            ResearchProviderStatus.COMPLETED,
+            ResearchProviderStatus.FAILED,
+            ResearchProviderStatus.SKIPPED,
+        }
 
-                for key, value in provider_result.items():
-                    setattr(result, key, value)
-
-            except Exception as e:
-                provider_status[provider_name] = f"Failed: {e}"
-
-        result.provider_status = provider_status
-
-        return result
+        return ResearchResult(
+            providers=results,
+            completed_providers=completed,
+            failed_providers=failed,
+            progress=round(100 * sum(result.status in terminal for result in results) / len(results)) if results else 0,
+            completed=bool(results) and all(result.status in terminal for result in results),
+            confidence=round(sum(confidence_values) / len(confidence_values), 2) if confidence_values else 0.0,
+        )

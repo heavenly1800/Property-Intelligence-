@@ -1,10 +1,6 @@
 import { api } from "../lib/api";
 import { endpoints } from "../lib/endpoints";
-
-export interface ResearchResult {
-    provider_status: Record<string, string>;
-    completed: boolean;
-}
+import type { ResearchResult } from "../models/research";
 
 export function runResearch(
     propertyId: string
