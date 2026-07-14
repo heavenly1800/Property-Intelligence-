@@ -18,3 +18,8 @@ class PropertyResponse(BaseModel):
     acres: Optional[float] = None
     square_feet: Optional[int] = None
     zoning: Optional[str] = None
+
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    census_tract: Optional[str] = None
+    block_group: Optional[str] = None

@@ -32,7 +32,13 @@ class ResearchService:
             for provider in result.providers
             if provider.status.value == "completed"
             for key, value in provider.data.items()
-            if key in {"latitude", "longitude"}
+            if key in {
+                "latitude",
+                "longitude",
+                "county",
+                "census_tract",
+                "block_group",
+            }
         }
 
         if research_data:

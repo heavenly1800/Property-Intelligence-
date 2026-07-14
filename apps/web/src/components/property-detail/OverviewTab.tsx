@@ -42,9 +42,7 @@ export default function OverviewTab({
           {loadingBuyers ? "Searching..." : "Find Buyers"}
         </button>
 
-        <button
-          className="workspace-action neutral"
-        >
+        <button className="workspace-action neutral">
           Generate Offer
         </button>
       </div>
@@ -59,22 +57,21 @@ export default function OverviewTab({
           <Info label="APN" value={property.apn} />
           <Info label="County" value={property.county} />
           <Info label="State" value={property.state} />
-          <Info
-            label="Property Type"
-            value={property.property_type}
-          />
-          <Info
-            label="Acres"
-            value={property.acres}
-          />
-          <Info
-            label="Square Feet"
-            value={property.square_feet}
-          />
-          <Info
-            label="Zoning"
-            value={property.zoning}
-          />
+          <Info label="Property Type" value={property.property_type} />
+          <Info label="Acres" value={property.acres} />
+          <Info label="Square Feet" value={property.square_feet} />
+          <Info label="Zoning" value={property.zoning} />
+        </div>
+      </section>
+
+      <section className="command-card overview-section">
+        <h2>Census Intelligence</h2>
+
+        <div className="property-snapshot">
+          <Info label="Latitude" value={property.latitude} />
+          <Info label="Longitude" value={property.longitude} />
+          <Info label="Census Tract" value={property.census_tract} />
+          <Info label="Block Group" value={property.block_group} />
         </div>
       </section>
 
@@ -109,19 +106,11 @@ type InfoProps = {
   value: string | number | undefined;
 };
 
-function Info({
-  label,
-  value,
-}: InfoProps) {
+function Info({ label, value }: InfoProps) {
   return (
     <div>
-      <p className="text-sm text-gray-500">
-        {label}
-      </p>
-
-      <p className="font-medium">
-        {value ?? "—"}
-      </p>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="font-medium">{value ?? "—"}</p>
     </div>
   );
 }

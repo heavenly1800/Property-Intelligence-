@@ -11,7 +11,6 @@ export type WorkflowStage =
   | "SOLD"
   | "ARCHIVED";
 
-
 export type Property = {
   property_id: string;
 
@@ -32,17 +31,15 @@ export type Property = {
 
   // Research Engine
   apn?: string;
-
   acres?: number;
-
   square_feet?: number;
-
   zoning?: string;
-
   owner_name?: string;
-
   latitude?: number;
   longitude?: number;
+  census_tract?: string;
+  block_group?: string;
+
   research_completed?: boolean;
   buyer_count?: number;
   offer_amount?: number;
