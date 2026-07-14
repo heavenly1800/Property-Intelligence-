@@ -1,10 +1,21 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Literal, Optional
+
+WorkflowStage = Literal[
+    "NEW_LEAD",
+    "RESEARCH",
+    "READY_TO_OFFER",
+    "OFFER_SENT",
+    "NEGOTIATING",
+    "UNDER_CONTRACT",
+    "MARKETING",
+    "SOLD",
+    "ARCHIVED",
+]
 
 
 @dataclass
 class Property:
-
     property_id: str
 
     apn: Optional[str]
@@ -26,3 +37,5 @@ class Property:
     square_feet: Optional[int]
 
     zoning: Optional[str]
+
+    workflow_stage: Optional[WorkflowStage] = None

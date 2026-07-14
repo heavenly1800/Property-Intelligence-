@@ -6,6 +6,9 @@ from app.routers.opportunities import router as opportunity_router
 from app.routers.intake import router as intake_router
 from app.routers.research import router as research_router
 from app.routers.decision import router as decision_router
+from app.infrastructure.database.property_repository import PropertyRepository
+
+
 
 app = FastAPI(
     title="Property Intelligence API",
@@ -38,6 +41,8 @@ async def health():
     return {
         "status": "healthy",
     }
+
+
 
 
 app.include_router(property_router)

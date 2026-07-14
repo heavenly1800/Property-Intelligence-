@@ -16,47 +16,164 @@ export default function DecisionPanel({
 }: DecisionPanelProps) {
   const color =
     workflow.nextAction === "research"
-      ? "bg-blue-600"
+      ? "#2563eb"
       : workflow.nextAction === "buyers"
-      ? "bg-green-600"
+      ? "#16a34a"
       : workflow.nextAction === "offer"
-      ? "bg-purple-600"
-      : "bg-gray-700";
+      ? "#7c3aed"
+      : "#374151";
 
   return (
     <section className="command-card decision-panel">
-      <div className="decision-heading">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 24,
+        }}
+      >
         <div>
-          <p className="eyebrow">Decision Engine</p>
+          <p
+            style={{
+              color: "#6b7280",
+              fontSize: 12,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              marginBottom: 8,
+            }}
+          >
+            Acquisition Brief
+          </p>
 
-          <h2>{decision.nextAction}</h2>
+          <h2 style={{ margin: 0 }}>
+            {decision.decision ?? "REVIEW PROPERTY"}
+          </h2>
+
+          <p
+            style={{
+              marginTop: 8,
+              color: "#6b7280",
+            }}
+          >
+            {decision.strategy ?? "Strategy pending"}
+          </p>
         </div>
 
-        <span
-          className={`decision-status ${color}`}
+        <div
+          style={{
+            background: color,
+            color: "white",
+            padding: "8px 16px",
+            borderRadius: 999,
+            fontWeight: 600,
+          }}
         >
           {workflow.stage.toUpperCase()}
-        </span>
+        </div>
       </div>
 
-      <p className="decision-description">{workflow.description}</p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2,1fr)",
+          gap: 20,
+          marginBottom: 24,
+        }}
+      >
+        <Metric
+          label="Opportunity Score"
+          value={decision.score}
+        />
 
-      <div className="decision-evidence">
-        <span>Score {decision.score}</span>
-        <span>Confidence {decision.confidence}%</span>
-        {decision.reasons.slice(0, 2).map((reason) => <p key={reason}>{reason}</p>)}
-        {decision.risks.slice(0, 1).map((risk) => <p className="decision-risk" key={risk}>{risk}</p>)}
+        <Metric
+          label="Confidence"
+          value={`${decision.confidence}%`}
+        />
       </div>
 
-      {workflow.canExecuteAction && onAction && (
-        <button
-          onClick={onAction}
-          disabled={loading}
-          className={`decision-button ${color}`}
-        >
-          {loading ? "Working..." : workflow.nextActionLabel}
-        </button>
+      <Section title="Next Action">
+        <p>{workflow.description}</p>
+
+        {workflow.canExecuteAction && onAction && (
+          <button
+            onClick={onAction}
+            disabled={loading}
+            className="decision-button"
+            style={{
+              background: color,
+              marginTop: 12,
+            }}
+          >
+            {loading
+              ? "Working..."
+              : workflow.nextActionLabel}
+          </button>
+        )}
+      </Section>
+
+      <Section title="Why This Property?">
+        <ul>
+          {decision.reasons.map((reason) => (
+            <li key={reason}>{reason}</li>
+          ))}
+        </ul>
+      </Section>
+
+      {decision.risks.length > 0 && (
+        <Section title="Risks">
+          <ul>
+            {decision.risks.map((risk) => (
+              <li key={risk}>{risk}</li>
+            ))}
+          </ul>
+        </Section>
       )}
     </section>
+  );
+}
+
+function Metric({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div>
+      <p
+        style={{
+          color: "#6b7280",
+          marginBottom: 4,
+        }}
+      >
+        {label}
+      </p>
+
+      <h3
+        style={{
+          margin: 0,
+          fontSize: 28,
+        }}
+      >
+        {value}
+      </h3>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: React.PropsWithChildren<{
+  title: string;
+}>) {
+  return (
+    <div style={{ marginTop: 24 }}>
+      <h3>{title}</h3>
+
+      {children}
+    </div>
   );
 }

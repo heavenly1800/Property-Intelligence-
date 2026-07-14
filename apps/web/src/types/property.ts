@@ -1,5 +1,17 @@
 import type { BackendWorkflow } from "../services/workflowService";
 
+export type WorkflowStage =
+  | "NEW_LEAD"
+  | "RESEARCH"
+  | "READY_TO_OFFER"
+  | "OFFER_SENT"
+  | "NEGOTIATING"
+  | "UNDER_CONTRACT"
+  | "MARKETING"
+  | "SOLD"
+  | "ARCHIVED";
+
+
 export type Property = {
   property_id: string;
 
@@ -35,4 +47,5 @@ export type Property = {
   buyer_count?: number;
   offer_amount?: number;
   workflow?: BackendWorkflow;
+  workflow_stage?: WorkflowStage;
 };

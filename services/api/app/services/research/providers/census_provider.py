@@ -3,16 +3,34 @@ from typing import Any
 import httpx
 
 from .base import ResearchProvider
-from .models import ResearchProviderResult, ResearchProviderStatus
+from .models import (
+    ResearchProviderResult,
+    ResearchProviderStatus,
+)
 
 
 class CensusProvider(ResearchProvider):
-    BASE_URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
+    BASE_URL = (
+        "https://geocoding.geo.census.gov/"
+        "geocoder/geographies/onelineaddress"
+    )
 
     async def execute(
-        self, property_data: dict[str, Any]
+        self,
+        property_data: dict[str, Any],
     ) -> ResearchProviderResult:
-        address = property_data.get("address")
+        parts = [
+            property_data.get("address"),
+            property_data.get("city"),
+            property_data.get("state"),
+            property_data.get("zip_code"),
+        ]
+
+        address = ", ".join(
+            str(part).strip()
+            for part in parts
+            if part
+        )
 
         if not address:
             return ResearchProviderResult(
@@ -28,13 +46,18 @@ class CensusProvider(ResearchProvider):
                     params={
                         "address": address,
                         "benchmark": "Public_AR_Current",
+                        "vintage": "Current_Current",
                         "format": "json",
                     },
                 )
 
             response.raise_for_status()
 
-            matches = response.json()["result"]["addressMatches"]
+            matches = (
+                response.json()
+                .get("result", {})
+                .get("addressMatches", [])
+            )
 
             if not matches:
                 return ResearchProviderResult(
@@ -44,21 +67,47 @@ class CensusProvider(ResearchProvider):
                 )
 
             match = matches[0]
+            coordinates = match["coordinates"]
+            geographies = match.get("geographies", {})
+
+            county = None
+            tract = None
+            block_group = None
+
+            counties = geographies.get("Counties", [])
+
+            if counties:
+                county = counties[0].get("NAME")
+
+            for geography_items in geographies.values():
+                if not geography_items:
+                    continue
+
+                geography = geography_items[0]
+
+                if tract is None:
+                    tract = geography.get("TRACT")
+
+                if block_group is None:
+                    block_group = geography.get("BLKGRP")
 
             return ResearchProviderResult(
                 provider="Census",
                 status=ResearchProviderStatus.COMPLETED,
-                confidence=0.9,
+                confidence=1.0,
                 data={
                     "matched_address": match["matchedAddress"],
-                    "latitude": match["coordinates"]["y"],
-                    "longitude": match["coordinates"]["x"],
+                    "latitude": coordinates["y"],
+                    "longitude": coordinates["x"],
+                    "county": county,
+                    "census_tract": tract,
+                    "block_group": block_group,
                 },
             )
 
-        except Exception as e:
+        except Exception as exc:
             return ResearchProviderResult(
                 provider="Census",
                 status=ResearchProviderStatus.FAILED,
-                message=str(e),
+                message=str(exc),
             )

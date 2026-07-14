@@ -1,43 +1,112 @@
+import { useEffect, useState } from "react";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
+import PropertyCard from "../components/property/PropertyCard";
+
+import { getProperties } from "../services/propertyService";
+import {
+  buildDashboardStats,
+  type DashboardStats,
+} from "../services/dashboardService";
 
 export default function Dashboard() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        const properties = await getProperties();
+        setStats(buildDashboardStats(properties));
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboard();
+  }, []);
+
   return (
     <DashboardLayout>
-
       <h1>Good Evening, Heavenly 👋</h1>
 
       <h2>Today's Opportunities</h2>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: 20,
-          marginTop: 30,
-        }}
-      >
-        <div style={{border:"1px solid #ddd",padding:20}}>
-          <h3>Properties</h3>
-          <h1>2</h1>
-        </div>
+      {loading && <p>Loading dashboard...</p>}
 
-        <div style={{border:"1px solid #ddd",padding:20}}>
-          <h3>Average Score</h3>
-          <h1>76</h1>
-        </div>
+      {!loading && stats && (
+        <>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4,1fr)",
+              gap: 20,
+              marginTop: 30,
+              marginBottom: 40,
+            }}
+          >
+            <StatCard
+              title="Properties"
+              value={stats.totalProperties}
+            />
 
-        <div style={{border:"1px solid #ddd",padding:20}}>
-          <h3>Wholesale Ready</h3>
-          <h1>1</h1>
-        </div>
+            <StatCard
+              title="Average Score"
+              value={stats.averageOpportunityScore}
+            />
 
-        <div style={{border:"1px solid #ddd",padding:20}}>
-          <h3>Needs Research</h3>
-          <h1>1</h1>
-        </div>
+            <StatCard
+              title="Ready to Offer"
+              value={stats.readyToOffer}
+            />
 
-      </div>
+            <StatCard
+              title="Needs Research"
+              value={stats.needsResearch}
+            />
+          </div>
 
+          <h2>Top Opportunities</h2>
+
+          {stats.topProperties.length === 0 ? (
+            <p>No properties available.</p>
+          ) : (
+            stats.topProperties.map((property) => (
+              <PropertyCard
+                key={property.property_id}
+                property={property}
+              />
+            ))
+          )}
+        </>
+      )}
     </DashboardLayout>
+  );
+}
+
+type StatCardProps = {
+  title: string;
+  value: string | number;
+};
+
+function StatCard({
+  title,
+  value,
+}: StatCardProps) {
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: 12,
+        padding: 20,
+        background: "#fff",
+      }}
+    >
+      <h3>{title}</h3>
+
+      <h1>{value}</h1>
+    </div>
   );
 }
