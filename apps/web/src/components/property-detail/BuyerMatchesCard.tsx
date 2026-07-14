@@ -1,7 +1,7 @@
-import type { Buyer } from "../../services/buyerService";
+import type { BuyerMatch } from "../../services/buyerService";
 
 type Props = {
-  buyers: Buyer[];
+  buyers: BuyerMatch[];
 };
 
 export default function BuyerMatchesCard({
@@ -34,11 +34,43 @@ export default function BuyerMatchesCard({
                 Confidence: {buyer.confidence}%
               </p>
 
-              <ul>
-                {buyer.reasons.map((reason) => (
-                  <li key={reason}>{reason}</li>
-                ))}
-              </ul>
+              {buyer.recommendation && (
+                <p className="font-medium text-blue-600">
+                  {buyer.recommendation}
+                </p>
+              )}
+
+              {(buyer.strengths?.length ?? 0) > 0 && (
+                <>
+                  <h4 className="mt-2 font-medium">
+                    Strengths
+                  </h4>
+
+                  <ul>
+                    {buyer.strengths!.map((strength) => (
+                      <li key={strength}>
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {(buyer.concerns?.length ?? 0) > 0 && (
+                <>
+                  <h4 className="mt-2 font-medium">
+                    Concerns
+                  </h4>
+
+                  <ul>
+                    {buyer.concerns!.map((concern) => (
+                      <li key={concern}>
+                        {concern}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           ))}
         </div>

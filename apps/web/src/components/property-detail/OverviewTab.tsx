@@ -1,12 +1,12 @@
 import BuyerMatchesCard from "./BuyerMatchesCard";
 import type { Property } from "../../types/property";
-import type { Buyer } from "../../services/buyerService";
+import type { BuyerMatch } from "../../services/buyerService";
 import type { ResearchResult } from "../../models/research";
 import ResearchStatusCard from "./ResearchStatusCard";
 
 type OverviewTabProps = {
   property: Property;
-  buyers: Buyer[];
+  buyers: BuyerMatch[];
   research: ResearchResult | null;
   researching: boolean;
   loadingBuyers: boolean;
@@ -42,7 +42,9 @@ export default function OverviewTab({
           {loadingBuyers ? "Searching..." : "Find Buyers"}
         </button>
 
-        <button className="workspace-action neutral">
+        <button
+          className="workspace-action neutral"
+        >
           Generate Offer
         </button>
       </div>
@@ -61,12 +63,18 @@ export default function OverviewTab({
             label="Property Type"
             value={property.property_type}
           />
-          <Info label="Acres" value={property.acres} />
+          <Info
+            label="Acres"
+            value={property.acres}
+          />
           <Info
             label="Square Feet"
             value={property.square_feet}
           />
-          <Info label="Zoning" value={property.zoning} />
+          <Info
+            label="Zoning"
+            value={property.zoning}
+          />
         </div>
       </section>
 
@@ -101,7 +109,10 @@ type InfoProps = {
   value: string | number | undefined;
 };
 
-function Info({ label, value }: InfoProps) {
+function Info({
+  label,
+  value,
+}: InfoProps) {
   return (
     <div>
       <p className="text-sm text-gray-500">
@@ -114,4 +125,3 @@ function Info({ label, value }: InfoProps) {
     </div>
   );
 }
-
