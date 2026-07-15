@@ -32,3 +32,13 @@ class PropertyResponse(BaseModel):
     jurisdiction: Optional[str] = None
     land_use: Optional[str] = None
     parcel_source: Optional[str] = None
+    owner_name: Optional[str] = None
+    owner_mailing_address: Optional[str] = None
+    assessed_land_value: Optional[float] = None
+    assessed_improvement_value: Optional[float] = None
+    assessed_total_value: Optional[float] = None
+    tax_year: Optional[int] = None
+    tax_status: Optional[str] = None
+    last_transfer_date: Optional[str] = None
+    last_transfer_price: Optional[float] = None
+    assessor_source: Optional[str] = None

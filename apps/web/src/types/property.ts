@@ -48,6 +48,15 @@ export type Property = {
   jurisdiction?: string;
   land_use?: string;
   parcel_source?: string;
+  owner_mailing_address?: string;
+  assessed_land_value?: number;
+  assessed_improvement_value?: number;
+  assessed_total_value?: number;
+  tax_year?: number;
+  tax_status?: string;
+  last_transfer_date?: string;
+  last_transfer_price?: number;
+  assessor_source?: string;
 
   research_completed?: boolean;
   buyer_count?: number;

@@ -44,6 +44,16 @@ class ResearchService:
             "jurisdiction": "jurisdiction",
             "land_use": "land_use",
             "parcel_source": "parcel_source",
+            "owner_name": "owner_name",
+            "owner_mailing_address": "owner_mailing_address",
+            "assessed_land_value": "assessed_land_value",
+            "assessed_improvement_value": "assessed_improvement_value",
+            "assessed_total_value": "assessed_total_value",
+            "tax_year": "tax_year",
+            "tax_status": "tax_status",
+            "last_transfer_date": "last_transfer_date",
+            "last_transfer_price": "last_transfer_price",
+            "assessor_source": "assessor_source",
         }
         research_data = {
             persisted_fields[key]: value

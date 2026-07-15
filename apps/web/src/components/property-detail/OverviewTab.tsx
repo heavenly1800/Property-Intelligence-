@@ -116,6 +116,41 @@ export default function OverviewTab({
       </section>
 
       <section className="command-card overview-section">
+        <h2>Ownership &amp; Assessment</h2>
+
+        <div className="property-snapshot">
+          <Info label="Owner" value={property.owner_name} />
+          <Info
+            label="Mailing Address"
+            value={property.owner_mailing_address}
+          />
+          <Info
+            label="Assessed Land Value"
+            value={property.assessed_land_value}
+          />
+          <Info
+            label="Assessed Improvement Value"
+            value={property.assessed_improvement_value}
+          />
+          <Info
+            label="Assessed Total Value"
+            value={property.assessed_total_value}
+          />
+          <Info label="Tax Year" value={property.tax_year} />
+          <Info label="Tax Status" value={property.tax_status} />
+          <Info
+            label="Last Transfer Date"
+            value={property.last_transfer_date}
+          />
+          <Info
+            label="Last Transfer Price"
+            value={property.last_transfer_price}
+          />
+          <Info label="Source" value={property.assessor_source} />
+        </div>
+      </section>
+
+      <section className="command-card overview-section">
         <h2>Acquisition Summary</h2>
 
         <BuyerMatchesCard buyers={buyers} />
