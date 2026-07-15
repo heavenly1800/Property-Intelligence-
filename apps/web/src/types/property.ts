@@ -44,6 +44,10 @@ export type Property = {
   special_flood_hazard_area?: boolean;
   flood_risk_level?: string;
   flood_source?: string;
+  parcel_acres?: number;
+  jurisdiction?: string;
+  land_use?: string;
+  parcel_source?: string;
 
   research_completed?: boolean;
   buyer_count?: number;

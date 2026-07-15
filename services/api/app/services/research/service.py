@@ -38,13 +38,23 @@ class ResearchService:
             "special_flood_hazard_area": "special_flood_hazard_area",
             "flood_risk_level": "flood_risk_level",
             "source": "flood_source",
+            "apn": "apn",
+            "parcel_acres": "parcel_acres",
+            "zoning": "zoning",
+            "jurisdiction": "jurisdiction",
+            "land_use": "land_use",
+            "parcel_source": "parcel_source",
         }
         research_data = {
             persisted_fields[key]: value
             for provider in result.providers
             if provider.status.value == "completed"
             for key, value in provider.data.items()
-            if key in persisted_fields and value is not None
+            if (
+                key in persisted_fields
+                and value is not None
+                and (not isinstance(value, str) or value.strip())
+            )
         }
 
         if research_data:

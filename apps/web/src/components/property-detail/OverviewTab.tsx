@@ -103,6 +103,19 @@ export default function OverviewTab({
       </section>
 
       <section className="command-card overview-section">
+        <h2>Parcel Intelligence</h2>
+
+        <div className="property-snapshot">
+          <Info label="APN" value={property.apn} />
+          <Info label="Parcel Acres" value={property.parcel_acres} />
+          <Info label="Zoning" value={property.zoning} />
+          <Info label="Jurisdiction" value={property.jurisdiction} />
+          <Info label="Land Use" value={property.land_use} />
+          <Info label="Source" value={property.parcel_source} />
+        </div>
+      </section>
+
+      <section className="command-card overview-section">
         <h2>Acquisition Summary</h2>
 
         <BuyerMatchesCard buyers={buyers} />

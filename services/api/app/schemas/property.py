@@ -28,3 +28,7 @@ class PropertyResponse(BaseModel):
     special_flood_hazard_area: Optional[bool] = None
     flood_risk_level: Optional[str] = None
     flood_source: Optional[str] = None
+    parcel_acres: Optional[float] = None
+    jurisdiction: Optional[str] = None
+    land_use: Optional[str] = None
+    parcel_source: Optional[str] = None
