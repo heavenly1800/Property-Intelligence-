@@ -7,6 +7,7 @@ from app.routers.intake import router as intake_router
 from app.routers.research import router as research_router
 from app.routers.decision import router as decision_router
 from app.routers.media import router as media_router
+from app.routers.share_intake import router as share_intake_router
 from app.infrastructure.database.property_repository import PropertyRepository
 
 
@@ -52,3 +53,4 @@ app.include_router(intake_router)
 app.include_router(research_router)
 app.include_router(decision_router)
 app.include_router(media_router)
+app.include_router(share_intake_router)

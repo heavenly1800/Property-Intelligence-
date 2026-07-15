@@ -45,3 +45,15 @@ class PropertyRepository:
         )
 
         return result.data
+
+    @staticmethod
+    def find_by_address(address: str):
+        results = (
+            supabase.table(PropertyRepository.TABLE)
+            .select("*")
+            .ilike("address", address)
+            .limit(1)
+            .execute()
+            .data
+        )
+        return results[0] if results else None

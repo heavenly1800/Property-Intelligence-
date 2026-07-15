@@ -5,6 +5,7 @@ import Properties from "./pages/Properties";
 import PropertyDetail from "./pages/PropertyDetail";
 import  Intake  from "./pages/Intake";
 import Settings from "./pages/Settings";
+import Share from "./pages/Share";
 
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           path="/settings"
           element={<Settings />}
         />
+        <Route path="/share" element={<Share />} />
       </Routes>
     </BrowserRouter>
   );

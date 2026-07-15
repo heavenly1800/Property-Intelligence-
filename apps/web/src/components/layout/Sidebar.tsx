@@ -26,6 +26,8 @@ export default function Sidebar() {
     </Link>
 </p>
 
+      <p><Link to="/share" style={{color:"white"}}>Share Listing</Link></p>
+
       <p><Link to="/properties" style={{color:"white"}}>Properties</Link></p>
 
       <p><Link to="/settings" style={{color:"white"}}>Settings</Link></p>

@@ -27,8 +27,9 @@ async function request<T>(
     );
 
     if (!response.ok) {
+        const body = await response.json().catch(() => null) as { detail?: string } | null;
         throw new ApiError(
-            response.statusText,
+            body?.detail ?? response.statusText,
             response.status
         );
     }
