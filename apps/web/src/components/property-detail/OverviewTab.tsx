@@ -76,6 +76,33 @@ export default function OverviewTab({
       </section>
 
       <section className="command-card overview-section">
+        <h2>Flood Risk</h2>
+
+        <div className="property-snapshot">
+          <Info label="Flood Zone" value={property.flood_zone} />
+          <Info
+            label="Zone Detail"
+            value={property.flood_zone_subtype}
+          />
+          <Info
+            label="Special Flood Hazard Area"
+            value={
+              property.special_flood_hazard_area === undefined
+                ? undefined
+                : property.special_flood_hazard_area
+                  ? "Yes"
+                  : "No"
+            }
+          />
+          <Info
+            label="Risk Level"
+            value={property.flood_risk_level}
+          />
+          <Info label="Source" value={property.flood_source} />
+        </div>
+      </section>
+
+      <section className="command-card overview-section">
         <h2>Acquisition Summary</h2>
 
         <BuyerMatchesCard buyers={buyers} />

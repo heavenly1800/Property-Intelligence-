@@ -39,6 +39,11 @@ export type Property = {
   longitude?: number;
   census_tract?: string;
   block_group?: string;
+  flood_zone?: string;
+  flood_zone_subtype?: string;
+  special_flood_hazard_area?: boolean;
+  flood_risk_level?: string;
+  flood_source?: string;
 
   research_completed?: boolean;
   buyer_count?: number;

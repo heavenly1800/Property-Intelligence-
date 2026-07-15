@@ -27,18 +27,24 @@ class ResearchService:
 
         result = await aggregator.execute(property_data)
 
+        persisted_fields = {
+            "latitude": "latitude",
+            "longitude": "longitude",
+            "county": "county",
+            "census_tract": "census_tract",
+            "block_group": "block_group",
+            "flood_zone": "flood_zone",
+            "flood_zone_subtype": "flood_zone_subtype",
+            "special_flood_hazard_area": "special_flood_hazard_area",
+            "flood_risk_level": "flood_risk_level",
+            "source": "flood_source",
+        }
         research_data = {
-            key: value
+            persisted_fields[key]: value
             for provider in result.providers
             if provider.status.value == "completed"
             for key, value in provider.data.items()
-            if key in {
-                "latitude",
-                "longitude",
-                "county",
-                "census_tract",
-                "block_group",
-            }
+            if key in persisted_fields and value is not None
         }
 
         if research_data:

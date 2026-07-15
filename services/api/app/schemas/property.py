@@ -23,3 +23,8 @@ class PropertyResponse(BaseModel):
     longitude: Optional[float] = None
     census_tract: Optional[str] = None
     block_group: Optional[str] = None
+    flood_zone: Optional[str] = None
+    flood_zone_subtype: Optional[str] = None
+    special_flood_hazard_area: Optional[bool] = None
+    flood_risk_level: Optional[str] = None
+    flood_source: Optional[str] = None

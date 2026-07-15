@@ -14,10 +14,15 @@ class ResearchAggregator:
 
     async def execute(self, property_data: dict[str, Any]) -> ResearchResult:
         results: list[ResearchProviderResult] = []
+        working_property = dict(property_data)
 
         for provider in self.providers:
             try:
-                results.append(await provider.execute(property_data))
+                provider_result = await provider.execute(working_property)
+                results.append(provider_result)
+
+                if provider_result.status == ResearchProviderStatus.COMPLETED:
+                    working_property.update(provider_result.data)
             except Exception as error:
                 results.append(
                     ResearchProviderResult(
