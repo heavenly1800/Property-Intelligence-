@@ -42,3 +42,14 @@ class PropertyResponse(BaseModel):
     last_transfer_date: Optional[str] = None
     last_transfer_price: Optional[float] = None
     assessor_source: Optional[str] = None
+    electric_provider: Optional[str] = None
+    electric_service_evidence: Optional[str] = None
+    gas_provider: Optional[str] = None
+    gas_service_evidence: Optional[str] = None
+    water_provider: Optional[str] = None
+    water_service_evidence: Optional[str] = None
+    sewer_provider: Optional[str] = None
+    sewer_service_evidence: Optional[str] = None
+    broadband_summary: Optional[str] = None
+    broadband_evidence: Optional[str] = None
+    utilities_source: Optional[str] = None

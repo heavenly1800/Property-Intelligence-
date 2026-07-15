@@ -54,6 +54,17 @@ class ResearchService:
             "last_transfer_date": "last_transfer_date",
             "last_transfer_price": "last_transfer_price",
             "assessor_source": "assessor_source",
+            "electric_provider": "electric_provider",
+            "electric_service_evidence": "electric_service_evidence",
+            "gas_provider": "gas_provider",
+            "gas_service_evidence": "gas_service_evidence",
+            "water_provider": "water_provider",
+            "water_service_evidence": "water_service_evidence",
+            "sewer_provider": "sewer_provider",
+            "sewer_service_evidence": "sewer_service_evidence",
+            "broadband_summary": "broadband_summary",
+            "broadband_evidence": "broadband_evidence",
+            "utilities_source": "utilities_source",
         }
         research_data = {
             persisted_fields[key]: value

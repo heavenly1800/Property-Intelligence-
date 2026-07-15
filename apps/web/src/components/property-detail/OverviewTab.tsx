@@ -151,6 +151,36 @@ export default function OverviewTab({
       </section>
 
       <section className="command-card overview-section">
+        <h2>Utilities</h2>
+
+        <div className="property-snapshot">
+          <Info label="Electric Provider" value={property.electric_provider} />
+          <Info
+            label="Electric Evidence"
+            value={property.electric_service_evidence}
+          />
+          <Info label="Gas Provider" value={property.gas_provider} />
+          <Info label="Gas Evidence" value={property.gas_service_evidence} />
+          <Info label="Water Provider" value={property.water_provider} />
+          <Info
+            label="Water Evidence"
+            value={property.water_service_evidence}
+          />
+          <Info label="Sewer Provider" value={property.sewer_provider} />
+          <Info
+            label="Sewer Evidence"
+            value={property.sewer_service_evidence}
+          />
+          <Info label="Broadband" value={property.broadband_summary} />
+          <Info
+            label="Broadband Evidence"
+            value={property.broadband_evidence}
+          />
+          <Info label="Sources" value={property.utilities_source} />
+        </div>
+      </section>
+
+      <section className="command-card overview-section">
         <h2>Acquisition Summary</h2>
 
         <BuyerMatchesCard buyers={buyers} />

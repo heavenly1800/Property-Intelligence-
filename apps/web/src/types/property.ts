@@ -57,6 +57,17 @@ export type Property = {
   last_transfer_date?: string;
   last_transfer_price?: number;
   assessor_source?: string;
+  electric_provider?: string;
+  electric_service_evidence?: string;
+  gas_provider?: string;
+  gas_service_evidence?: string;
+  water_provider?: string;
+  water_service_evidence?: string;
+  sewer_provider?: string;
+  sewer_service_evidence?: string;
+  broadband_summary?: string;
+  broadband_evidence?: string;
+  utilities_source?: string;
 
   research_completed?: boolean;
   buyer_count?: number;
