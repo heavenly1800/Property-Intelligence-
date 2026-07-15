@@ -3,6 +3,7 @@ import type { Property } from "../../types/property";
 import type { BuyerMatch } from "../../services/buyerService";
 import type { ResearchResult } from "../../models/research";
 import ResearchStatusCard from "./ResearchStatusCard";
+import FinancialIntelligenceCard from "./FinancialIntelligenceCard";
 
 type OverviewTabProps = {
   property: Property;
@@ -12,6 +13,7 @@ type OverviewTabProps = {
   loadingBuyers: boolean;
   onRunResearch: () => void;
   onFindBuyers: () => void;
+  onRefreshProperty: () => Promise<void>;
 };
 
 export default function OverviewTab({
@@ -22,6 +24,7 @@ export default function OverviewTab({
   loadingBuyers,
   onRunResearch,
   onFindBuyers,
+  onRefreshProperty,
 }: OverviewTabProps) {
   return (
     <div className="overview-content">
@@ -48,6 +51,37 @@ export default function OverviewTab({
       </div>
 
       <ResearchStatusCard research={research} />
+
+      <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty} />
+
+      <section className="command-card overview-section">
+        <h2>Research Quality</h2>
+
+        <div className="property-snapshot">
+          <Info label="Score" value={property.research_quality_score} />
+          <Info label="Overall Risk" value={property.research_risk_level} />
+          <Info label="Parcel Certainty" value={property.parcel_certainty} />
+          <Info
+            label="Assessment Coverage"
+            value={property.assessment_coverage}
+          />
+          <Info
+            label="Utility Confidence"
+            value={property.utility_confidence}
+          />
+          <Info
+            label="Recommended Next Step"
+            value={property.recommended_research_action}
+          />
+        </div>
+
+        <div className="mt-4">
+          <p className="text-sm text-gray-500">Missing Research Items</p>
+          <p className="font-medium">
+            {property.missing_research_items?.join(" · ") ?? "—"}
+          </p>
+        </div>
+      </section>
 
       <section className="command-card overview-section">
         <h2>Property Snapshot</h2>

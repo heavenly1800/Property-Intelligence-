@@ -4,6 +4,9 @@ export const endpoints = {
     property: (id: string) =>
         `/properties/${id}`,
 
+    financials: (id: string) =>
+        `/properties/${id}/financials`,
+
     research: (id: string) =>
         `/research/${id}`,
 

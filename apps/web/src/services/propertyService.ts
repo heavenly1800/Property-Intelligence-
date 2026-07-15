@@ -38,3 +38,10 @@ export async function deleteProperty(
         endpoints.property(id)
     );
 }
+
+export async function updateFinancials(
+    id: string,
+    property: Partial<Property>
+): Promise<Property> {
+    return api.put<Property>(endpoints.financials(id), property);
+}

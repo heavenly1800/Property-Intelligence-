@@ -1,5 +1,6 @@
 from app.infrastructure.database.property_repository import PropertyRepository
 from app.services.research.orchestrator import ResearchAggregator
+from app.services.research.quality_service import ResearchQualityService
 from app.services.research.providers.census_provider import CensusProvider
 from app.services.research.providers.county_gis_provider import CountyGISProvider
 from app.services.research.providers.fema_provider import FEMAProvider
@@ -80,5 +81,10 @@ class ResearchService:
 
         if research_data:
             PropertyRepository.update(property_id, research_data)
+
+        final_property_data = {**property_data, **research_data}
+        quality_summary = ResearchQualityService.evaluate(final_property_data)
+        PropertyRepository.update(property_id, quality_summary.model_dump())
+        result.quality_summary = quality_summary
 
         return result
