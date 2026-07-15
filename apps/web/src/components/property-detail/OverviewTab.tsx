@@ -4,6 +4,8 @@ import type { BuyerMatch } from "../../services/buyerService";
 import type { ResearchResult } from "../../models/research";
 import ResearchStatusCard from "./ResearchStatusCard";
 import FinancialIntelligenceCard from "./FinancialIntelligenceCard";
+import PropertyMediaGallery from "./PropertyMediaGallery";
+import ListingIntelligenceCard from "./ListingIntelligenceCard";
 
 type OverviewTabProps = {
   property: Property;
@@ -53,6 +55,8 @@ export default function OverviewTab({
       <ResearchStatusCard research={research} />
 
       <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty} />
+      <PropertyMediaGallery propertyId={property.property_id} />
+      <ListingIntelligenceCard property={property} onSaved={onRefreshProperty} />
 
       <section className="command-card overview-section">
         <h2>Research Quality</h2>

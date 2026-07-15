@@ -7,6 +7,9 @@ export const endpoints = {
     financials: (id: string) =>
         `/properties/${id}/financials`,
 
+    listingAnalysis: (id: string) =>
+        `/properties/${id}/listing-analysis`,
+
     research: (id: string) =>
         `/research/${id}`,
 

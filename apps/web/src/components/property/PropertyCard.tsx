@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import type { Property } from "../../types/property";
+import { listPropertyMedia } from "../../services/propertyMediaService";
 
 type Props = {
   property: Property;
@@ -8,6 +10,8 @@ type Props = {
 export default function PropertyCard({
   property,
 }: Props) {
+  const [primaryImage, setPrimaryImage] = useState<string>();
+  useEffect(() => { listPropertyMedia(property.property_id).then((media) => setPrimaryImage(media.find((item) => item.is_primary)?.public_url)).catch(() => undefined); }, [property.property_id]);
   return (
     <Link
       to={`/properties/${property.property_id}`}
@@ -25,6 +29,7 @@ export default function PropertyCard({
           boxShadow: "0 2px 8px rgba(0,0,0,.08)",
         }}
       >
+        {primaryImage && <img src={primaryImage} alt={`${property.address} primary`} style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 8, marginBottom: 14 }} />}
         <h2>{property.address}</h2>
 
         <p>

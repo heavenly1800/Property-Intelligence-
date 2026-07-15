@@ -1,0 +1,10 @@
+import { useState } from "react";
+import { analyzeListing } from "../../services/listingService";
+import type { Property } from "../../types/property";
+
+export default function ListingIntelligenceCard({ property, onSaved }: { property: Property; onSaved: () => Promise<void> }) {
+  const [text, setText] = useState(property.listing_raw_text ?? ""); const [saving, setSaving] = useState(false); const [error, setError] = useState("");
+  async function submit() { if (!text.trim()) return; setSaving(true); try { await analyzeListing(property.property_id, text); await onSaved(); setError(""); } catch (err) { setError(err instanceof Error ? err.message : "Listing analysis failed."); } finally { setSaving(false); } }
+  return <section className="command-card overview-section"><h2>Listing Intelligence</h2><textarea className="listing-text" value={text} onChange={(event) => setText(event.target.value)} placeholder="Paste listing text manually. No listing websites are scraped." rows={7} /><button className="workspace-action primary mt-3" onClick={() => void submit()} disabled={saving || !text.trim()}>{saving ? "Analyzing…" : "Analyze Listing"}</button>{error && <p className="media-error">{error}</p>}<p className="text-sm text-gray-500">Status: {property.listing_analysis_status ?? "Not analyzed"}{property.listing_last_analyzed_at ? ` · ${new Date(property.listing_last_analyzed_at).toLocaleString()}` : ""}</p>{property.listing_summary && <p>{property.listing_summary}</p>}<ListingList title="Highlights" items={property.listing_highlights} /><ListingList title="Disclosed Risks" items={property.listing_risks} /><ListingList title="Missing Information" items={property.listing_missing_items} /></section>;
+}
+function ListingList({ title, items }: { title: string; items?: string[] }) { return <div><p className="font-medium">{title}</p>{items?.length ? <ul className="listing-list">{items.map((item) => <li key={item}>{item}</li>)}</ul> : <p className="text-sm text-gray-500">—</p>}</div>; }
