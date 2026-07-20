@@ -7,6 +7,8 @@ import FinancialIntelligenceCard from "./FinancialIntelligenceCard";
 import PropertyMediaGallery from "./PropertyMediaGallery";
 import ListingIntelligenceCard from "./ListingIntelligenceCard";
 import AIConditionAnalysisCard from "./AIConditionAnalysisCard";
+import ComparablesSection from "./ComparablesSection";
+import DealStrategySection from "./DealStrategySection";
 
 type OverviewTabProps = {
   property: Property;
@@ -58,6 +60,8 @@ export default function OverviewTab({
       <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty}>
         <AIConditionAnalysisCard propertyId={property.property_id} />
       </FinancialIntelligenceCard>
+      <ComparablesSection propertyId={property.property_id} />
+      <DealStrategySection propertyId={property.property_id} />
       <PropertyMediaGallery propertyId={property.property_id} />
       <ListingIntelligenceCard property={property} onSaved={onRefreshProperty} />
 
