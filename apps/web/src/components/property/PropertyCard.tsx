@@ -67,6 +67,9 @@ export default function PropertyCard({
           {" "}
           {property.next_action ?? "Analyze"}
         </p>
+        <p><strong>Stage:</strong> {(property.workflow_stage ?? "NEW_LEAD").replaceAll("_", " ")}</p>
+        <p><strong>Primary seller:</strong> {property.primary_seller_name ?? "Not added"}</p>
+        <p><strong>Next follow-up:</strong> {property.next_follow_up ? new Date(property.next_follow_up).toLocaleString() : "Not scheduled"} {property.has_overdue && <span style={{color:"#b42318",fontWeight:700}}>· OVERDUE</span>}</p>
       </div>
     </Link>
   );

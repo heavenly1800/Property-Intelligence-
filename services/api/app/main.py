@@ -13,6 +13,7 @@ from app.routers.comparables import router as comparables_router
 from app.routers.strategy_analysis import router as strategy_analysis_router
 from app.routers.offer_analysis import router as offer_analysis_router
 from app.routers.financing import router as financing_router
+from app.routers.crm import router as crm_router
 from app.infrastructure.database.property_repository import PropertyRepository
 
 
@@ -64,3 +65,4 @@ app.include_router(comparables_router)
 app.include_router(strategy_analysis_router)
 app.include_router(offer_analysis_router)
 app.include_router(financing_router)
+app.include_router(crm_router)

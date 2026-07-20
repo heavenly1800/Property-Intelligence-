@@ -129,4 +129,8 @@ export type Property = {
   offer_amount?: number;
   workflow?: BackendWorkflow;
   workflow_stage?: WorkflowStage;
+  crm_assigned_to?: string;
+  next_follow_up?: string;
+  has_overdue?: boolean;
+  primary_seller_name?: string;
 };

@@ -1,0 +1,12 @@
+import type {WorkflowStage} from "./property";
+export type Contact={contact_id:string;property_id:string;first_name?:string;last_name?:string;company_name?:string;role?:string;phone?:string;email?:string;mailing_address?:string;preferred_contact_method?:string;best_contact_time?:string;is_primary:boolean;contact_status:string;notes?:string;created_at:string;updated_at:string};
+export type ContactInput=Omit<Contact,"contact_id"|"property_id"|"created_at"|"updated_at">;
+export type FollowUpTask={task_id:string;property_id:string;contact_id?:string;title:string;description?:string;task_type:string;due_at?:string;priority:string;status:string;completed_at?:string;assigned_to?:string;reminder_at?:string;is_overdue:boolean;created_at:string;updated_at:string};
+export type Note={note_id:string;property_id:string;contact_id?:string;note_type:string;body:string;is_pinned:boolean;created_at:string;updated_at:string};
+export type Deadline={deadline_id:string;property_id:string;deadline_type:string;title:string;due_at:string;status:string;notes?:string;created_at:string;updated_at:string};
+export type Activity={activity_id:string;property_id:string;activity_type:string;entity_type?:string;entity_id?:string;title:string;description?:string;metadata:Record<string,unknown>;occurred_at:string};
+export type WorkflowHistory={history_id:string;property_id:string;from_stage?:WorkflowStage;to_stage:WorkflowStage;reason?:string;changed_by?:string;changed_at:string};
+export type WorkflowState={property_id:string;current_stage:WorkflowStage;assigned_to?:string};
+export type SentOffer={sent_offer_id:string;property_id:string;offer_analysis_id?:string;contact_id?:string;offer_amount:number;sent_at:string;delivery_method?:string;expiration_at?:string;status:string;response_notes?:string;created_at:string;updated_at:string};
+export type PropertyCrmSummary={current_stage:WorkflowStage;assigned_to?:string;next_follow_up?:string;has_overdue:boolean;primary_seller_name?:string};
+export type CrmDashboard={leads_by_stage:Record<WorkflowStage,number>;overdue_tasks:number;due_today:number;due_this_week:number;under_contract:number;offers_sent:number;follow_ups_needed:number;property_summaries:Record<string,PropertyCrmSummary>};

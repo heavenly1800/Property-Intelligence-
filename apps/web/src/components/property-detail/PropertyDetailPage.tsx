@@ -10,10 +10,12 @@ import PropertyWorkspaceHeader from "./PropertyWorkspaceHeader";
 import ResearchStatusCard from "./ResearchStatusCard";
 import OfferCalculatorSection from "./OfferCalculatorSection";
 import FinancingSection from "./FinancingSection";
+import AcquisitionCrmSection from "./AcquisitionCrmSection";
+import SentOfferRecorder from "./SentOfferRecorder";
 import "./PropertyDetailPage.css";
 
-type Tab = "Overview" | "Research" | "Buyers" | "Offers" | "Financing" | "Timeline" | "Notes" | "Documents" | "AI";
-const tabs: Tab[] = ["Overview", "Research", "Buyers", "Offers", "Financing", "Timeline", "Notes", "Documents", "AI"];
+type Tab = "Overview" | "Acquisition" | "Research" | "Buyers" | "Offers" | "Financing" | "Timeline" | "Notes" | "Documents" | "AI";
+const tabs: Tab[] = ["Overview", "Acquisition", "Research", "Buyers", "Offers", "Financing", "Timeline", "Notes", "Documents", "AI"];
 
 export default function PropertyDetailPage() {
   const { property, loading, refresh } = useProperty();
@@ -26,9 +28,10 @@ export default function PropertyDetailPage() {
 
   function renderTab() {
     if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} research={research} researching={isExecuting} loadingBuyers={isExecuting} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} onGenerateOffer={() => setTab("Offers")} />;
+    if (tab === "Acquisition") return <AcquisitionCrmSection propertyId={currentProperty.property_id} onStageChange={refresh} />;
     if (tab === "Research") return <ResearchStatusCard research={research} />;
     if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} />;
-    if (tab === "Offers") return <OfferCalculatorSection propertyId={currentProperty.property_id} />;
+    if (tab === "Offers") return <><OfferCalculatorSection propertyId={currentProperty.property_id} /><SentOfferRecorder propertyId={currentProperty.property_id} /></>;
     if (tab === "Financing") return <FinancingSection propertyId={currentProperty.property_id} />;
     return <section className="command-card empty-workspace"><p className="eyebrow">{tab}</p><h2>{tab} workspace</h2><p>This workspace is ready for your team’s {tab.toLowerCase()} activity.</p></section>;
   }

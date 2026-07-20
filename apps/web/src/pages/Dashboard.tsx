@@ -8,16 +8,19 @@ import {
   buildDashboardStats,
   type DashboardStats,
 } from "../services/dashboardService";
+import { getCrmDashboard } from "../services/crmService";
+import type { CrmDashboard } from "../types/crm";
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [crm,setCrm]=useState<CrmDashboard|null>(null);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const properties = await getProperties();
-        setStats(buildDashboardStats(properties));
+        const [properties,crmData] = await Promise.all([getProperties(),getCrmDashboard()]); setCrm(crmData);
+        setStats(buildDashboardStats(properties.map(p=>({...p,...crmData.property_summaries[p.property_id],workflow_stage:crmData.property_summaries[p.property_id]?.current_stage??p.workflow_stage}))));
       } catch (error) {
         console.error(error);
       } finally {
@@ -67,6 +70,7 @@ export default function Dashboard() {
               value={stats.needsResearch}
             />
           </div>
+          {crm&&<><h2>Acquisition workflow</h2><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginBottom:30}}><StatCard title="Overdue tasks" value={crm.overdue_tasks}/><StatCard title="Due today" value={crm.due_today}/><StatCard title="Due this week" value={crm.due_this_week}/><StatCard title="Under contract" value={crm.under_contract}/><StatCard title="Offers sent" value={crm.offers_sent}/><StatCard title="Follow-ups needed" value={crm.follow_ups_needed}/></div><p>{Object.entries(crm.leads_by_stage).map(([stage,count])=>`${stage.replaceAll("_"," ")}: ${count}`).join(" · ")}</p></>}
 
           <h2>Top Opportunities</h2>
 

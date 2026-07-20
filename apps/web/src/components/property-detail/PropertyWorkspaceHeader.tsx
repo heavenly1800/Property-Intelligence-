@@ -3,7 +3,7 @@ import type { Property } from "../../types/property";
 type PropertyWorkspaceHeaderProps = { property: Property };
 
 export default function PropertyWorkspaceHeader({ property }: PropertyWorkspaceHeaderProps) {
-  const stage = property.next_action ? "Active review" : "New lead";
+  const stage = (property.workflow_stage ?? "NEW_LEAD").replaceAll("_", " ");
   return (
     <header className="workspace-header">
       <div>

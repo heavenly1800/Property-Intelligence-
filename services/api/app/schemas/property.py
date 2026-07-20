@@ -18,6 +18,8 @@ class PropertyResponse(BaseModel):
     acres: Optional[float] = None
     square_feet: Optional[int] = None
     zoning: Optional[str] = None
+    workflow_stage: Optional[str] = "NEW_LEAD"
+    crm_assigned_to: Optional[str] = None
 
     latitude: Optional[float] = None
     longitude: Optional[float] = None
