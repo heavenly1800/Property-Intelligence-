@@ -17,6 +17,18 @@ class PropertyMediaRepository:
         return supabase.table(cls.TABLE).update(data).eq("media_id", media_id).execute().data[0]
 
     @classmethod
+    def begin_analysis(cls, media_id: str):
+        rows = (
+            supabase.table(cls.TABLE)
+            .update({"analysis_status": "analyzing"})
+            .eq("media_id", media_id)
+            .neq("analysis_status", "analyzing")
+            .execute()
+            .data
+        )
+        return rows[0] if rows else None
+
+    @classmethod
     def get(cls, media_id: str):
         rows = supabase.table(cls.TABLE).select("*").eq("media_id", media_id).execute().data
         return rows[0] if rows else None

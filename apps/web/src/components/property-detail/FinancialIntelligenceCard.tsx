@@ -3,12 +3,12 @@ import { useState } from "react";
 import { updateFinancials } from "../../services/propertyService";
 import type { Property } from "../../types/property";
 
-type Props = { property: Property; onSaved: () => Promise<void> };
+type Props = { property: Property; onSaved: () => Promise<void>; children?: React.ReactNode };
 
 const money = (value?: number) => value == null ? "—" : value.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const percent = (value?: number) => value == null ? "—" : `${(value * 100).toFixed(2)}%`;
 
-export default function FinancialIntelligenceCard({ property, onSaved }: Props) {
+export default function FinancialIntelligenceCard({ property, onSaved, children }: Props) {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     listing_url: property.listing_url ?? "", listing_source: property.listing_source ?? "",
@@ -91,6 +91,7 @@ export default function FinancialIntelligenceCard({ property, onSaved }: Props) 
         <Fact label="Post-Rehab Rent" value={money(property.estimated_post_rehab_monthly_rent)} />
       </div>
     </section>
+    {children}
     <section className="command-card overview-section"><h2>Manual Financial Inputs</h2><div className="grid grid-cols-1 gap-2 md:grid-cols-2">
       <Input label="Asking Price" value={form.asking_price} set={(v) => set("asking_price", v)} /><Input label="Unit Count" value={form.unit_count} set={(v) => set("unit_count", v)} />
       <Input label="Listing URL" value={form.listing_url} set={(v) => set("listing_url", v)} /><Input label="Listing Source" value={form.listing_source} set={(v) => set("listing_source", v)} />

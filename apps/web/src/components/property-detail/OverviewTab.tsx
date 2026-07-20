@@ -6,6 +6,7 @@ import ResearchStatusCard from "./ResearchStatusCard";
 import FinancialIntelligenceCard from "./FinancialIntelligenceCard";
 import PropertyMediaGallery from "./PropertyMediaGallery";
 import ListingIntelligenceCard from "./ListingIntelligenceCard";
+import AIConditionAnalysisCard from "./AIConditionAnalysisCard";
 
 type OverviewTabProps = {
   property: Property;
@@ -54,7 +55,9 @@ export default function OverviewTab({
 
       <ResearchStatusCard research={research} />
 
-      <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty} />
+      <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty}>
+        <AIConditionAnalysisCard propertyId={property.property_id} />
+      </FinancialIntelligenceCard>
       <PropertyMediaGallery propertyId={property.property_id} />
       <ListingIntelligenceCard property={property} onSaved={onRefreshProperty} />
 
