@@ -117,6 +117,24 @@ design/
 
 ## Development
 
+### Windows quick start
+
+From the repository root, start both development services in separate PowerShell windows:
+
+```powershell
+.\start-dev.ps1
+```
+
+The script clears only listeners on ports 8000 and 5173, starts the backend and frontend, and verifies both HTTP endpoints. To stop those development services:
+
+```powershell
+.\stop-dev.ps1
+```
+
+If local execution policy blocks scripts, use `powershell -ExecutionPolicy Bypass -File .\start-dev.ps1` or the corresponding `stop-dev.ps1` command.
+
+### Manual start
+
 Frontend
 
 ```bash

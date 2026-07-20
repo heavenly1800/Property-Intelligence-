@@ -9,10 +9,11 @@ import OverviewTab from "./OverviewTab";
 import PropertyWorkspaceHeader from "./PropertyWorkspaceHeader";
 import ResearchStatusCard from "./ResearchStatusCard";
 import OfferCalculatorSection from "./OfferCalculatorSection";
+import FinancingSection from "./FinancingSection";
 import "./PropertyDetailPage.css";
 
-type Tab = "Overview" | "Research" | "Buyers" | "Offers" | "Timeline" | "Notes" | "Documents" | "AI";
-const tabs: Tab[] = ["Overview", "Research", "Buyers", "Offers", "Timeline", "Notes", "Documents", "AI"];
+type Tab = "Overview" | "Research" | "Buyers" | "Offers" | "Financing" | "Timeline" | "Notes" | "Documents" | "AI";
+const tabs: Tab[] = ["Overview", "Research", "Buyers", "Offers", "Financing", "Timeline", "Notes", "Documents", "AI"];
 
 export default function PropertyDetailPage() {
   const { property, loading, refresh } = useProperty();
@@ -28,6 +29,7 @@ export default function PropertyDetailPage() {
     if (tab === "Research") return <ResearchStatusCard research={research} />;
     if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} />;
     if (tab === "Offers") return <OfferCalculatorSection propertyId={currentProperty.property_id} />;
+    if (tab === "Financing") return <FinancingSection propertyId={currentProperty.property_id} />;
     return <section className="command-card empty-workspace"><p className="eyebrow">{tab}</p><h2>{tab} workspace</h2><p>This workspace is ready for your team’s {tab.toLowerCase()} activity.</p></section>;
   }
 
