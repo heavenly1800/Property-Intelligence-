@@ -19,6 +19,7 @@ type OverviewTabProps = {
   onRunResearch: () => void;
   onFindBuyers: () => void;
   onRefreshProperty: () => Promise<void>;
+  onGenerateOffer: () => void;
 };
 
 export default function OverviewTab({
@@ -30,6 +31,7 @@ export default function OverviewTab({
   onRunResearch,
   onFindBuyers,
   onRefreshProperty,
+  onGenerateOffer,
 }: OverviewTabProps) {
   return (
     <div className="overview-content">
@@ -50,7 +52,7 @@ export default function OverviewTab({
           {loadingBuyers ? "Searching..." : "Find Buyers"}
         </button>
 
-        <button className="workspace-action neutral">
+        <button className="workspace-action neutral" onClick={onGenerateOffer}>
           Generate Offer
         </button>
       </div>

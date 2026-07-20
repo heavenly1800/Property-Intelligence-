@@ -8,6 +8,7 @@ import DecisionPanel from "./DecisionPanel";
 import OverviewTab from "./OverviewTab";
 import PropertyWorkspaceHeader from "./PropertyWorkspaceHeader";
 import ResearchStatusCard from "./ResearchStatusCard";
+import OfferCalculatorSection from "./OfferCalculatorSection";
 import "./PropertyDetailPage.css";
 
 type Tab = "Overview" | "Research" | "Buyers" | "Offers" | "Timeline" | "Notes" | "Documents" | "AI";
@@ -23,9 +24,10 @@ export default function PropertyDetailPage() {
   const currentProperty = property;
 
   function renderTab() {
-    if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} research={research} researching={isExecuting} loadingBuyers={isExecuting} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} />;
+    if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} research={research} researching={isExecuting} loadingBuyers={isExecuting} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} onGenerateOffer={() => setTab("Offers")} />;
     if (tab === "Research") return <ResearchStatusCard research={research} />;
     if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} />;
+    if (tab === "Offers") return <OfferCalculatorSection propertyId={currentProperty.property_id} />;
     return <section className="command-card empty-workspace"><p className="eyebrow">{tab}</p><h2>{tab} workspace</h2><p>This workspace is ready for your team’s {tab.toLowerCase()} activity.</p></section>;
   }
 

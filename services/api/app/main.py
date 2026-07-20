@@ -11,6 +11,7 @@ from app.routers.share_intake import router as share_intake_router
 from app.routers.repair_costs import router as repair_costs_router
 from app.routers.comparables import router as comparables_router
 from app.routers.strategy_analysis import router as strategy_analysis_router
+from app.routers.offer_analysis import router as offer_analysis_router
 from app.infrastructure.database.property_repository import PropertyRepository
 
 
@@ -60,3 +61,4 @@ app.include_router(share_intake_router)
 app.include_router(repair_costs_router)
 app.include_router(comparables_router)
 app.include_router(strategy_analysis_router)
+app.include_router(offer_analysis_router)
