@@ -10,16 +10,19 @@ import {
 } from "../services/dashboardService";
 import { getCrmDashboard } from "../services/crmService";
 import type { CrmDashboard } from "../types/crm";
+import { getNotifications, getUnreadCount } from "../services/notificationService";
+import type { Notification } from "../types/notification";
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [crm,setCrm]=useState<CrmDashboard|null>(null);
+  const [notifications,setNotifications]=useState<Notification[]>([]),[unread,setUnread]=useState(0);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [properties,crmData] = await Promise.all([getProperties(),getCrmDashboard()]); setCrm(crmData);
+        const [properties,crmData,notices,count] = await Promise.all([getProperties(),getCrmDashboard(),getNotifications({unread_only:true,include_dismissed:false}),getUnreadCount()]); setCrm(crmData);setNotifications(notices);setUnread(count.unread_count);
         setStats(buildDashboardStats(properties.map(p=>({...p,...crmData.property_summaries[p.property_id],workflow_stage:crmData.property_summaries[p.property_id]?.current_stage??p.workflow_stage}))));
       } catch (error) {
         console.error(error);
@@ -71,6 +74,8 @@ export default function Dashboard() {
             />
           </div>
           {crm&&<><h2>Acquisition workflow</h2><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginBottom:30}}><StatCard title="Overdue tasks" value={crm.overdue_tasks}/><StatCard title="Due today" value={crm.due_today}/><StatCard title="Due this week" value={crm.due_this_week}/><StatCard title="Under contract" value={crm.under_contract}/><StatCard title="Offers sent" value={crm.offers_sent}/><StatCard title="Follow-ups needed" value={crm.follow_ups_needed}/></div><p>{Object.entries(crm.leads_by_stage).map(([stage,count])=>`${stage.replaceAll("_"," ")}: ${count}`).join(" · ")}</p></>}
+
+          <h2>Notification risks</h2><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}><StatCard title="Unread" value={unread}/><StatCard title="Deadlines at risk" value={notifications.filter(n=>n.notification_type.includes("deadline")).length}/><StatCard title="Expiring offers" value={notifications.filter(n=>n.notification_type==="offer_expiring").length}/><StatCard title="Stale leads" value={notifications.filter(n=>n.notification_type==="stale_lead").length}/></div>{notifications.slice(0,5).map(n=><p key={n.notification_id}><strong>{n.severity.toUpperCase()}:</strong> {n.title} · {n.property_id}</p>)}
 
           <h2>Top Opportunities</h2>
 

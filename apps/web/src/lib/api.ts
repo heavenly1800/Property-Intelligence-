@@ -1,6 +1,6 @@
 const API_BASE_URL =
     import.meta.env.VITE_API_URL ??
-    "http://localhost:8000";
+    "http://127.0.0.1:8000";
 
 export class ApiError extends Error {
     status: number;

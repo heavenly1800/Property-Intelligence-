@@ -35,6 +35,16 @@ function Stop-PortListener {
 
 Stop-PortListener -Port 8000
 Stop-PortListener -Port 5173
+$scannerPidFile = Join-Path $repositoryRoot ".notification-scanner.pid"
+if (Test-Path -LiteralPath $scannerPidFile) {
+    $scannerPid = [int](Get-Content -LiteralPath $scannerPidFile -Raw)
+    $scannerProcess = Get-Process -Id $scannerPid -ErrorAction SilentlyContinue
+    if ($null -ne $scannerProcess) {
+        Write-Host "Stopping notification scanner PID $scannerPid..." -ForegroundColor Yellow
+        Stop-Process -Id $scannerPid -Force
+    }
+    Remove-Item -LiteralPath $scannerPidFile -Force -ErrorAction SilentlyContinue
+}
 Start-Sleep -Seconds 1
 
 $remainingListeners = @(

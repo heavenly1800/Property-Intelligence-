@@ -127,6 +127,19 @@ From the repository root, start both development services in separate PowerShell
 
 The script clears only listeners on ports 8000 and 5173, starts the backend and frontend, and verifies both HTTP endpoints. To stop those development services:
 
+To also run the local in-app notification scanner every five minutes:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\start-dev.ps1 -WithScanner
+```
+
+Run one notification scan without starting a recurring worker:
+
+```powershell
+cd services/api
+.\.venv\Scripts\python.exe -m app.jobs.notification_scan
+```
+
 ```powershell
 .\stop-dev.ps1
 ```

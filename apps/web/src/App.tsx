@@ -6,6 +6,7 @@ import PropertyDetail from "./pages/PropertyDetail";
 import  Intake  from "./pages/Intake";
 import Settings from "./pages/Settings";
 import Share from "./pages/Share";
+import NotificationsPage from "./pages/Notifications";
 
 
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           element={<Settings />}
         />
         <Route path="/share" element={<Share />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
       </Routes>
     </BrowserRouter>
   );

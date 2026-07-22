@@ -1,3 +1,4 @@
+import NotificationCenter from "./NotificationCenter";
 export default function Topbar() {
   return (
     <div
@@ -6,12 +7,12 @@ export default function Topbar() {
         borderBottom: "1px solid #ddd",
         display: "flex",
         alignItems: "center",
-        paddingLeft: 30,
+        padding: "0 30px",
         fontSize: 22,
         fontWeight: "bold",
       }}
     >
-      Opportunity Command Center
+      <span>Opportunity Command Center</span><span style={{marginLeft:"auto"}}><NotificationCenter /></span>
     </div>
   );
 }

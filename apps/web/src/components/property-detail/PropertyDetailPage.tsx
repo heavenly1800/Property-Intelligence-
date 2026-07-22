@@ -12,6 +12,7 @@ import OfferCalculatorSection from "./OfferCalculatorSection";
 import FinancingSection from "./FinancingSection";
 import AcquisitionCrmSection from "./AcquisitionCrmSection";
 import SentOfferRecorder from "./SentOfferRecorder";
+import PropertyNotifications from "./PropertyNotifications";
 import "./PropertyDetailPage.css";
 
 type Tab = "Overview" | "Acquisition" | "Research" | "Buyers" | "Offers" | "Financing" | "Timeline" | "Notes" | "Documents" | "AI";
@@ -28,7 +29,7 @@ export default function PropertyDetailPage() {
 
   function renderTab() {
     if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} research={research} researching={isExecuting} loadingBuyers={isExecuting} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} onGenerateOffer={() => setTab("Offers")} />;
-    if (tab === "Acquisition") return <AcquisitionCrmSection propertyId={currentProperty.property_id} onStageChange={refresh} />;
+    if (tab === "Acquisition") return <><PropertyNotifications propertyId={currentProperty.property_id} /><AcquisitionCrmSection propertyId={currentProperty.property_id} onStageChange={refresh} /></>;
     if (tab === "Research") return <ResearchStatusCard research={research} />;
     if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} />;
     if (tab === "Offers") return <><OfferCalculatorSection propertyId={currentProperty.property_id} /><SentOfferRecorder propertyId={currentProperty.property_id} /></>;
