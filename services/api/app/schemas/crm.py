@@ -8,6 +8,8 @@ class ContactInput(BaseModel):
  first_name:str|None=None; last_name:str|None=None; company_name:str|None=None; role:str|None=None; phone:str|None=None; email:str|None=None; mailing_address:str|None=None; preferred_contact_method:str|None=None; best_contact_time:str|None=None; is_primary:bool=False; contact_status:str="active"; notes:str|None=None
 class ContactPatch(BaseModel):
  first_name:str|None=None; last_name:str|None=None; company_name:str|None=None; role:str|None=None; phone:str|None=None; email:str|None=None; mailing_address:str|None=None; preferred_contact_method:str|None=None; best_contact_time:str|None=None; is_primary:bool|None=None; contact_status:str|None=None; notes:str|None=None
+class ConsentPatch(BaseModel):
+ email_consent_status:Literal["unknown","consented","transactional_only","opted_out","prohibited"]|None=None; email_consent_source:str|None=None; email_consent_at:str|None=None; sms_consent_status:Literal["unknown","consented","transactional_only","opted_out","prohibited"]|None=None; sms_consent_source:str|None=None; sms_consent_at:str|None=None; sms_opted_out_at:str|None=None; email_opted_out_at:str|None=None; do_not_contact:bool|None=None; preferred_contact_method:str|None=None; timezone:str|None=None
 class TaskInput(BaseModel):
  contact_id:str|None=None; title:str=Field(min_length=1); description:str|None=None; task_type:str="follow_up"; due_at:str|None=None; priority:str="normal"; status:str="open"; assigned_to:str|None=None; reminder_at:str|None=None
 class TaskPatch(BaseModel):

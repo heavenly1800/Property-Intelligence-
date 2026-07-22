@@ -15,6 +15,7 @@ from app.routers.offer_analysis import router as offer_analysis_router
 from app.routers.financing import router as financing_router
 from app.routers.crm import router as crm_router
 from app.routers.notifications import router as notifications_router
+from app.routers.communications import router as communications_router
 from app.infrastructure.database.property_repository import PropertyRepository
 
 
@@ -69,3 +70,4 @@ app.include_router(offer_analysis_router)
 app.include_router(financing_router)
 app.include_router(crm_router)
 app.include_router(notifications_router)
+app.include_router(communications_router)

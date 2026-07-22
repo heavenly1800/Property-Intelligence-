@@ -76,6 +76,12 @@ class Settings(BaseSettings):
     NOTIFICATION_STALE_LEAD_DAYS_JSON: str = ""
     NOTIFICATION_UNDER_CONTRACT_CRITICAL_WINDOW_DAYS: int = 3
     NOTIFICATION_SCAN_INTERVAL_SECONDS: int = 300
+    COMMUNICATIONS_ENABLED: bool = False
+    EMAIL_PROVIDER: str = "console"
+    SMS_PROVIDER: str = "console"
+    ALLOW_CONSOLE_DELIVERY: bool = False
+    COMMUNICATION_BUSINESS_NAME: str = "Property Intelligence"
+    COMMUNICATION_SMS_OPT_OUT_TEXT: str = "Reply STOP to opt out."
 
 
 @lru_cache
