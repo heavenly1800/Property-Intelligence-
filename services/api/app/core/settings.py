@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     ALLOW_CONSOLE_DELIVERY: bool = False
     COMMUNICATION_BUSINESS_NAME: str = "Property Intelligence"
     COMMUNICATION_SMS_OPT_OUT_TEXT: str = "Reply STOP to opt out."
+    AUTH_REQUIRED: bool = True
+    SUPABASE_URL: str = ""
+    SUPABASE_ANON_KEY: str = ""
+    SUPABASE_SERVICE_ROLE_KEY: str = ""
 
 
 @lru_cache

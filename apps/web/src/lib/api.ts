@@ -15,11 +15,14 @@ async function request<T>(
     endpoint: string,
     options?: RequestInit
 ): Promise<T> {
+    const session=getSession();const organizationId=getSelectedOrganization();
     const response = await fetch(
         `${API_BASE_URL}${endpoint}`,
         {
             headers: {
                 "Content-Type": "application/json",
+                ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                ...(organizationId ? { "X-Organization-ID": organizationId } : {}),
                 ...(options?.headers ?? {}),
             },
             ...options,
@@ -28,6 +31,7 @@ async function request<T>(
 
     if (!response.ok) {
         const body = await response.json().catch(() => null) as { detail?: string } | null;
+        if(response.status===401){clearAuth();if(location.pathname!=="/sign-in")location.assign("/sign-in");}
         throw new ApiError(
             body?.detail ?? response.statusText,
             response.status
@@ -71,3 +75,4 @@ export const api = {
             method: "DELETE",
         }),
 };
+import { clearAuth, getSelectedOrganization, getSession } from "../services/authStorage";

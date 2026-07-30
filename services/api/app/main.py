@@ -16,7 +16,9 @@ from app.routers.financing import router as financing_router
 from app.routers.crm import router as crm_router
 from app.routers.notifications import router as notifications_router
 from app.routers.communications import router as communications_router
+from app.routers.auth import router as auth_router
 from app.infrastructure.database.property_repository import PropertyRepository
+from app.core.auth import auth_middleware
 
 
 
@@ -26,6 +28,7 @@ app = FastAPI(
     description="The backend API for Property Intelligence.",
 )
 
+app.middleware("http")(auth_middleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -71,3 +74,4 @@ app.include_router(financing_router)
 app.include_router(crm_router)
 app.include_router(notifications_router)
 app.include_router(communications_router)
+app.include_router(auth_router)

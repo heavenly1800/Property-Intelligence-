@@ -5,6 +5,7 @@ from app.schemas.communication import DraftRequest,MessagePatch,PreviewRequest,S
 from app.schemas.crm import ConsentPatch
 from app.services.communication_service import CommunicationService
 from app.core.settings import get_settings
+from app.core.auth import require_permission
 router=APIRouter(tags=["Seller Communications"])
 @router.get("/communications/configuration")
 async def communication_configuration():
@@ -31,7 +32,7 @@ async def preview_template(template_id:str,request:PreviewRequest):return safe(l
 @router.get("/properties/{property_id}/communications")
 async def messages(property_id:str):return CommunicationRepository.list_messages(property_id)
 @router.post("/properties/{property_id}/communications/draft")
-async def create_draft(property_id:str,request:DraftRequest):return safe(lambda:CommunicationService.create_draft(property_id,request.model_dump()))
+async def create_draft(property_id:str,request:DraftRequest):require_permission("communications.draft");return safe(lambda:CommunicationService.create_draft(property_id,request.model_dump()))
 @router.patch("/properties/{property_id}/communications/{message_id}")
 async def update_message(property_id:str,message_id:str,request:MessagePatch):return required(CommunicationRepository.update_message(property_id,message_id,request.model_dump(exclude_unset=True)))
 @router.delete("/properties/{property_id}/communications/{message_id}")
@@ -40,7 +41,7 @@ async def delete_message(property_id:str,message_id:str):CommunicationRepository
 async def preview_message(property_id:str,message_id:str):
  message=required(CommunicationRepository.message(property_id,message_id));return {"subject":message.get("subject"),"body":message["body"],"variables":message.get("rendered_variables",{}),"consent_snapshot":message.get("consent_snapshot",{})}
 @router.post("/properties/{property_id}/communications/{message_id}/send")
-async def send_message(property_id:str,message_id:str,request:SendRequest):return required(CommunicationService.send(property_id,message_id,request.confirm_send))
+async def send_message(property_id:str,message_id:str,request:SendRequest):require_permission("communications.send");return required(CommunicationService.send(property_id,message_id,request.confirm_send))
 @router.post("/properties/{property_id}/communications/{message_id}/cancel")
 async def cancel_message(property_id:str,message_id:str):
  row=required(CommunicationRepository.update_message(property_id,message_id,{"status":"cancelled"}));CrmRepository.activity(property_id,"communication_cancelled","message",message_id,"Communication cancelled");return row

@@ -7,38 +7,41 @@ import  Intake  from "./pages/Intake";
 import Settings from "./pages/Settings";
 import Share from "./pages/Share";
 import NotificationsPage from "./pages/Notifications";
+import SignIn from "./pages/SignIn";
+import UpdatePassword from "./pages/UpdatePassword";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
+      <Routes><Route path="/sign-in" element={<SignIn/>}/><Route path="/update-password" element={<UpdatePassword/>}/>
         <Route
           path="/"
-          element={<Dashboard />}
+          element={<ProtectedRoute><Dashboard /></ProtectedRoute>}
         />
 
         <Route
           path="/properties"
-          element={<Properties />}
+          element={<ProtectedRoute><Properties /></ProtectedRoute>}
         />
 
         <Route
           path="/properties/:id"
-          element={<PropertyDetail />}
+          element={<ProtectedRoute><PropertyDetail /></ProtectedRoute>}
         />
 
         <Route
     path="/intake"
-    element={<Intake />}
+    element={<ProtectedRoute><Intake /></ProtectedRoute>}
 />
 
         <Route
           path="/settings"
-          element={<Settings />}
+          element={<ProtectedRoute><Settings /></ProtectedRoute>}
         />
-        <Route path="/share" element={<Share />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/share" element={<ProtectedRoute><Share /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

@@ -166,6 +166,26 @@ cd services/api
 python -m uvicorn app.main:app --reload
 ```
 
+### Authentication and organizations
+
+Apply the SQL migrations in `database/migrations` in numeric order, including
+`021_add_auth_organizations_rls.sql`. Migration 021 creates the organization,
+membership, invitation, profile, and audit tables; assigns existing development
+records (including PROP-001) to a fixed development organization; and enables
+organization-scoped row-level security.
+
+Create a user in Supabase Authentication (or enable the desired email provider),
+then configure the backend `services/api/.env` with `SUPABASE_URL`,
+`SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`. The service-role key is
+backend-only and must never be copied into the web application.
+
+Copy `apps/web/.env.example` to `apps/web/.env.local` and set the Supabase URL
+and public anon key. On first sign-in, the organization setup screen assigns the
+first user as owner of the migrated development organization. Later users should
+join through an invitation. The selected organization is sent in
+`X-Organization-ID` on API requests and is validated against the signed-in user's
+active membership.
+
 ---
 
 ## Mission
