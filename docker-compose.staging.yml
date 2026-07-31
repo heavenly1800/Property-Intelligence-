@@ -1,7 +1,8 @@
 services:
   backend:
     build:
-      context: ./services/api
+      context: .
+      dockerfile: services/api/Dockerfile
     env_file: .env.staging
     ports:
       - "8000:8000"
@@ -23,7 +24,8 @@ services:
 
   scanner:
     build:
-      context: ./services/api
+      context: .
+      dockerfile: services/api/Dockerfile
     env_file: .env.staging
     command: ["python", "-m", "app.jobs.notification_scan", "--batch-size", "100"]
     profiles: ["cron"]

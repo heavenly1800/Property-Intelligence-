@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_WINDOW_SECONDS: int = 60
     IDEMPOTENCY_RETENTION_SECONDS: int = 3600
     SCANNER_BATCH_SIZE: int = 100
+    SCANNER_LOCK_TTL_SECONDS: int = 3600
     SCANNER_MODE: Literal["local", "oneshot"] = "local"
     RENTCAST_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
@@ -157,6 +158,8 @@ class Settings(BaseSettings):
             errors.append("NOTIFICATION_SCAN_INTERVAL_SECONDS must be positive.")
         if self.SCANNER_BATCH_SIZE < 1:
             errors.append("SCANNER_BATCH_SIZE must be positive.")
+        if self.SCANNER_LOCK_TTL_SECONDS < 60:
+            errors.append("SCANNER_LOCK_TTL_SECONDS must be at least 60.")
         return errors
 
     def validate_runtime(self) -> None:

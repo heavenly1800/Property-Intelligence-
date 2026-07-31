@@ -1,5 +1,8 @@
 # Staging deployment
 
+For the provider-specific first deployment using Render, Vercel, and Supabase,
+follow [STAGING_RUNBOOK.md](STAGING_RUNBOOK.md).
+
 ## Environment model
 
 `APP_ENV` must be `development`, `test`, `staging`, or `production`. Development and test default to the two local Vite origins and enabled API docs. Staging requires explicit origins and has configurable docs. Production disables docs by default. Placeholder and wildcard credentialed-origin values are rejected in staging and production.
@@ -10,7 +13,7 @@ Backend-only secrets are `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY`. They 
 
 1. Create a separate staging Supabase project and enable email/password Auth.
 2. Configure Site URL and allowed redirects for the exact staging frontend origin and `/update-password`.
-3. Apply `database/migrations/001_create_properties.sql` through `021_add_auth_organizations_rls.sql` in order.
+3. Apply `database/migrations/001_create_properties.sql` through `022_add_scanner_execution_lock.sql` in order.
 4. Create a test Auth user and bootstrap the migrated development organization.
 5. Run SQL checks as authenticated viewer, analyst, manager, admin, suspended user, and service role. Confirm cross-organization `SELECT`, `INSERT`, `UPDATE`, and `DELETE` attempts fail and service-role maintenance succeeds.
 6. Enable Supabase backups/PITR appropriate to the deployment tier before real data is accepted.
@@ -35,7 +38,7 @@ Run the scanner as a hosted cron one-shot every five minutes:
 python -m app.jobs.notification_scan --batch-size 100
 ```
 
-The socket lock prevents overlap on one host. It is not a distributed lock. Likewise, rate limits and idempotency replay are in-memory and single-instance; use shared Redis/database implementations before horizontally scaling.
+The socket lock prevents overlap on one host and migration 022 adds a Supabase lease for hosted cron containers. Rate limits and idempotency replay remain in-memory and single-instance; use shared Redis/database implementations before horizontally scaling the API.
 
 ## Rollback and operations
 

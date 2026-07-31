@@ -168,11 +168,12 @@ python -m uvicorn app.main:app --reload
 
 ### Authentication and organizations
 
-Apply the SQL migrations in `database/migrations` in numeric order, including
-`021_add_auth_organizations_rls.sql`. Migration 021 creates the organization,
+Apply the SQL migrations in `database/migrations` in numeric order through
+`022_add_scanner_execution_lock.sql`. Migration 021 creates the organization,
 membership, invitation, profile, and audit tables; assigns existing development
 records (including PROP-001) to a fixed development organization; and enables
-organization-scoped row-level security.
+organization-scoped row-level security. Migration 022 adds the service-role-only
+lease used to prevent overlapping hosted notification scans.
 
 Create a user in Supabase Authentication (or enable the desired email provider),
 then configure the backend `services/api/.env` with `SUPABASE_URL`,
@@ -192,6 +193,8 @@ Deployment environment variables, containers, health checks, scanner cron,
 rollback guidance, RLS verification, and the security checklist are documented
 in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Start from the committed example
 files; never copy backend service-role or OpenAI secrets into a `VITE_` variable.
+The first Render + Vercel staging rollout is covered by
+[docs/STAGING_RUNBOOK.md](docs/STAGING_RUNBOOK.md).
 
 ---
 

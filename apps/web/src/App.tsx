@@ -9,13 +9,14 @@ import Share from "./pages/Share";
 import NotificationsPage from "./pages/Notifications";
 import SignIn from "./pages/SignIn";
 import UpdatePassword from "./pages/UpdatePassword";
+import AcceptInvitation from "./pages/AcceptInvitation";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes><Route path="/sign-in" element={<SignIn/>}/><Route path="/update-password" element={<UpdatePassword/>}/>
+      <Routes><Route path="/sign-in" element={<SignIn/>}/><Route path="/update-password" element={<UpdatePassword/>}/><Route path="/invitations/accept" element={<AcceptInvitation/>}/>
         <Route
           path="/"
           element={<ProtectedRoute><Dashboard /></ProtectedRoute>}

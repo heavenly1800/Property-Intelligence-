@@ -1,0 +1,133 @@
+# yaml-language-server: $schema=https://json.schemastore.org/render.json
+services:
+  - type: web
+    name: property-intelligence-api-staging
+    runtime: docker
+    plan: starter
+    branch: staging
+    autoDeployTrigger: checksPass
+    dockerfilePath: ./services/api/Dockerfile
+    dockerCommand: >-
+      sh -c 'python -m uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --no-proxy-headers'
+    healthCheckPath: /health/ready
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: APP_VERSION
+        value: 0.1.0
+      - key: BUILD_ID
+        sync: false
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        value: 10000
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: TRUSTED_HOSTS
+        value: property-intelligence-api-staging.onrender.com
+      - key: TRUST_PROXY_HEADERS
+        value: "false"
+      - key: DOCS_ENABLED
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AI_ANALYSIS_ENABLED
+        value: "true"
+      - key: COMMUNICATIONS_ENABLED
+        value: "false"
+      - key: EMAIL_PROVIDER
+        value: console
+      - key: SMS_PROVIDER
+        value: console
+      - key: ALLOW_CONSOLE_DELIVERY
+        value: "false"
+      - key: NOTIFICATION_SCAN_INTERVAL_SECONDS
+        value: "600"
+      - key: SCANNER_BATCH_SIZE
+        value: "100"
+      - key: SCANNER_LOCK_TTL_SECONDS
+        value: "3600"
+      - key: SCANNER_MODE
+        value: oneshot
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_REQUESTS
+        value: "10"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: IDEMPOTENCY_RETENTION_SECONDS
+        value: "3600"
+
+  - type: cron
+    name: property-intelligence-notifications-staging
+    runtime: docker
+    plan: starter
+    branch: staging
+    autoDeployTrigger: checksPass
+    schedule: "*/10 * * * *"
+    dockerfilePath: ./services/api/Dockerfile
+    dockerCommand: python -m app.jobs.notification_scan --batch-size 100
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: APP_VERSION
+        value: 0.1.0
+      - key: BUILD_ID
+        sync: false
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: API_PORT
+        value: 10000
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: TRUSTED_HOSTS
+        value: property-intelligence-api-staging.onrender.com
+      - key: TRUST_PROXY_HEADERS
+        value: "false"
+      - key: DOCS_ENABLED
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AI_ANALYSIS_ENABLED
+        value: "true"
+      - key: COMMUNICATIONS_ENABLED
+        value: "false"
+      - key: EMAIL_PROVIDER
+        value: console
+      - key: SMS_PROVIDER
+        value: console
+      - key: ALLOW_CONSOLE_DELIVERY
+        value: "false"
+      - key: NOTIFICATION_SCAN_INTERVAL_SECONDS
+        value: "600"
+      - key: SCANNER_BATCH_SIZE
+        value: "100"
+      - key: SCANNER_LOCK_TTL_SECONDS
+        value: "3600"
+      - key: SCANNER_MODE
+        value: oneshot
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_REQUESTS
+        value: "10"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "60"
+      - key: IDEMPOTENCY_RETENTION_SECONDS
+        value: "3600"

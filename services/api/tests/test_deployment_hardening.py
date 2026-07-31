@@ -65,6 +65,20 @@ class DeploymentHardeningTest(unittest.TestCase):
   self.assertIn("scanner_stopped",output.getvalue())
   self.assertNotIn(DUMMY["SUPABASE_SERVICE_ROLE_KEY"],output.getvalue())
 
+ def test_scanner_distributed_lock_success_and_conflict(self):
+  class Query:
+   def delete(self):return self
+   def eq(self,*_):return self
+   def lt(self,*_):return self
+   def insert(self,*_):return self
+   def execute(self):return SimpleNamespace(data=[])
+  database=SimpleNamespace(table=lambda _:Query())
+  with patch("app.infrastructure.database.supabase.service_supabase",database):
+   self.assertIsNotNone(notification_scan.acquire_distributed_lock(300))
+  conflict=SimpleNamespace(table=lambda _:(_ for _ in ()).throw(RuntimeError("unique conflict")))
+  with patch("app.infrastructure.database.supabase.service_supabase",conflict):
+   self.assertIsNone(notification_scan.acquire_distributed_lock(300))
+
  def test_health_docs_errors_and_headers(self):
   from app.main import app
   client=TestClient(app)

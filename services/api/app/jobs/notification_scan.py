@@ -1,5 +1,5 @@
-import argparse,json,os,signal,socket,sys,time
-from datetime import datetime,timezone
+import argparse,json,os,signal,socket,sys,time,uuid
+from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from app.core.settings import get_settings
 from app.services.notification_service import NotificationService
@@ -14,6 +14,21 @@ def acquire_lock():
  lock=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
  try:lock.bind(("127.0.0.1",LOCK_PORT));lock.listen(1);return lock
  except OSError:lock.close();return None
+
+def acquire_distributed_lock(ttl_seconds):
+ from app.infrastructure.database.supabase import service_supabase
+ owner=str(uuid.uuid4());now=datetime.now(timezone.utc);expires=now+timedelta(seconds=ttl_seconds)
+ try:
+  service_supabase.table("scanner_execution_locks").delete().eq("lock_name","notification-scan").lt("expires_at",now.isoformat()).execute()
+  service_supabase.table("scanner_execution_locks").insert({"lock_name":"notification-scan","owner_id":owner,"acquired_at":now.isoformat(),"expires_at":expires.isoformat()}).execute()
+  return owner
+ except Exception:
+  return None
+
+def release_distributed_lock(owner):
+ from app.infrastructure.database.supabase import service_supabase
+ try:service_supabase.table("scanner_execution_locks").delete().eq("lock_name","notification-scan").eq("owner_id",owner).execute()
+ except Exception:log("WARNING","scanner_distributed_lock_release_failed")
 
 def request_shutdown(*_):
  global stopping
@@ -30,6 +45,10 @@ def main(argv=None):
  if args.interval<0 or args.batch_size<1:parser.error("interval must be non-negative and batch-size must be positive")
  lock=acquire_lock()
  if not lock:log("ERROR","scanner_overlap_rejected");return 2
+ distributed_owner=None
+ if settings.is_deployed:
+  distributed_owner=acquire_distributed_lock(settings.SCANNER_LOCK_TTL_SECONDS)
+  if not distributed_owner:lock.close();log("ERROR","scanner_distributed_overlap_or_lock_failure");return 2
  signal.signal(signal.SIGINT,request_shutdown)
  if hasattr(signal,"SIGTERM"):signal.signal(signal.SIGTERM,request_shutdown)
  pid_path=Path(args.pid_file) if args.pid_file else None
@@ -46,6 +65,7 @@ def main(argv=None):
    deadline=time.monotonic()+args.interval
    while not stopping and time.monotonic()<deadline:time.sleep(min(0.5,deadline-time.monotonic()))
  finally:
+  if distributed_owner:release_distributed_lock(distributed_owner)
   lock.close()
   if pid_path:
    try:pid_path.unlink(missing_ok=True)
