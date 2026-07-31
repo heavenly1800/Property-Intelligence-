@@ -1,4 +1,4 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException,Request
 from app.infrastructure.database.communication_repository import CommunicationRepository
 from app.infrastructure.database.crm_repository import CrmRepository
 from app.schemas.communication import DraftRequest,MessagePatch,PreviewRequest,SendRequest,TemplateInput,TemplatePatch
@@ -6,6 +6,7 @@ from app.schemas.crm import ConsentPatch
 from app.services.communication_service import CommunicationService
 from app.core.settings import get_settings
 from app.core.auth import require_permission
+from app.core.resilience import protected_operation
 router=APIRouter(tags=["Seller Communications"])
 @router.get("/communications/configuration")
 async def communication_configuration():
@@ -41,7 +42,7 @@ async def delete_message(property_id:str,message_id:str):CommunicationRepository
 async def preview_message(property_id:str,message_id:str):
  message=required(CommunicationRepository.message(property_id,message_id));return {"subject":message.get("subject"),"body":message["body"],"variables":message.get("rendered_variables",{}),"consent_snapshot":message.get("consent_snapshot",{})}
 @router.post("/properties/{property_id}/communications/{message_id}/send")
-async def send_message(property_id:str,message_id:str,request:SendRequest):require_permission("communications.send");return required(CommunicationService.send(property_id,message_id,request.confirm_send))
+async def send_message(property_id:str,message_id:str,data:SendRequest,request:Request):require_permission("communications.send");return protected_operation(request,"communication-send",{"property_id":property_id,"message_id":message_id,**data.model_dump()},lambda:required(CommunicationService.send(property_id,message_id,data.confirm_send)))
 @router.post("/properties/{property_id}/communications/{message_id}/cancel")
 async def cancel_message(property_id:str,message_id:str):
  row=required(CommunicationRepository.update_message(property_id,message_id,{"status":"cancelled"}));CrmRepository.activity(property_id,"communication_cancelled","message",message_id,"Communication cancelled");return row

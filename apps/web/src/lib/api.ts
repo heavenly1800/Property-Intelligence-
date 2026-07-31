@@ -1,13 +1,15 @@
-const API_BASE_URL =
-    import.meta.env.VITE_API_URL ??
-    "http://127.0.0.1:8000";
+import { publicConfig } from "./config";
+
+const API_BASE_URL = publicConfig?.apiUrl ?? "";
 
 export class ApiError extends Error {
     status: number;
+    requestId?: string;
 
-    constructor(message: string, status: number) {
+    constructor(message: string, status: number, requestId?: string) {
         super(message);
         this.status = status;
+        this.requestId = requestId;
     }
 }
 
@@ -16,9 +18,9 @@ async function request<T>(
     options?: RequestInit
 ): Promise<T> {
     const session=getSession();const organizationId=getSelectedOrganization();
-    const response = await fetch(
-        `${API_BASE_URL}${endpoint}`,
-        {
+    let response: Response;
+    try {
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
             headers: {
                 "Content-Type": "application/json",
                 ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
@@ -26,15 +28,20 @@ async function request<T>(
                 ...(options?.headers ?? {}),
             },
             ...options,
-        }
-    );
+        });
+    } catch {
+        throw new ApiError("The API is unreachable. Check your connection and try again.", 0);
+    }
 
     if (!response.ok) {
-        const body = await response.json().catch(() => null) as { detail?: string } | null;
+        const body = await response.json().catch(() => null) as { detail?: string; message?: string; request_id?: string } | null;
         if(response.status===401){clearAuth();if(location.pathname!=="/sign-in")location.assign("/sign-in");}
+        const requestId=body?.request_id??response.headers.get("X-Request-ID")??undefined;
+        const fallback=response.status===403?"You do not have permission for this action.":response.status===429?`Too many requests. Try again in ${response.headers.get("Retry-After")??"a few"} seconds.`:response.statusText||"Network request failed.";
         throw new ApiError(
-            body?.detail ?? response.statusText,
-            response.status
+            `${body?.message??body?.detail??fallback}${requestId&&response.status>=500?` Request ID: ${requestId}`:""}`,
+            response.status,
+            requestId
         );
     }
 

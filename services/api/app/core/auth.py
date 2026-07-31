@@ -12,7 +12,7 @@ ROLE_PERMISSIONS={
  "admin":{"organization.read","organization.manage","members.read","members.manage","property.read","property.create","property.update","property.delete","crm.read","crm.manage","analysis.read","analysis.manage","offer.manage","communications.read","communications.draft","communications.send","notifications.manage"},
  "owner":{"*"},
 }
-PUBLIC={"/","/health","/docs","/openapi.json","/redoc"}
+PUBLIC={"/","/health","/health/live","/health/ready","/health/version","/docs","/openapi.json","/redoc"}
 def context():
  value=_context.get()
  if not value:raise HTTPException(401,"Authentication is required.")
@@ -34,24 +34,25 @@ async def auth_middleware(request:Request,call_next):
   try:return await call_next(request)
   finally:_context.reset(test_token)
  header=request.headers.get("Authorization","")
- if not header.startswith("Bearer "):return _error(401,"Authentication is required.")
+ if not header.startswith("Bearer "):return _error(request,401,"Authentication is required.")
  token=header[7:]
  try:user=service_supabase.auth.get_user(token).user
- except Exception:return _error(401,"Session is invalid or expired.")
+ except Exception:return _error(request,401,"Session is invalid or expired.")
  org=request.headers.get("X-Organization-ID");membership=None
  if org:
   rows=service_supabase.table("organization_members").select("*").eq("organization_id",org).eq("user_id",user.id).eq("status","active").execute().data
-  if not rows:return _error(403,"No active membership exists for the selected organization.")
+  if not rows:return _error(request,403,"No active membership exists for the selected organization.")
   membership=rows[0]
- elif not request.url.path.startswith("/auth/"):return _error(400,"X-Organization-ID is required.")
+ elif not request.url.path.startswith("/auth/"):return _error(request,400,"X-Organization-ID is required.")
  if org and request.method in ("POST","PUT","PATCH") and "application/json" in request.headers.get("content-type",""):
   try:
    body=await request.json();supplied=body.get("organization_id") if isinstance(body,dict) else None
-   if supplied and supplied!=org:return _error(403,"Request-body organization_id does not match the validated organization header.")
+   if supplied and supplied!=org:return _error(request,403,"Request-body organization_id does not match the validated organization header.")
   except ValueError:pass
- ctx=RequestContext(user.id,org,(membership or {}).get("role"),(membership or {}).get("membership_id"));ctx_token=_context.set(ctx);db_token=set_request_client(token,org)
+ ctx=RequestContext(user.id,org,(membership or {}).get("role"),(membership or {}).get("membership_id"));request.state.user_id=user.id;request.state.organization_id=org;request.state.role=ctx.role;request.state.membership_id=ctx.membership_id;ctx_token=_context.set(ctx);db_token=set_request_client(token,org)
  try:return await call_next(request)
  finally:reset_request_client(db_token);_context.reset(ctx_token)
-def _error(status,detail):
+def _error(request,status,detail):
  from fastapi.responses import JSONResponse
- return JSONResponse({"detail":detail},status_code=status)
+ from app.core.deployment import error_body
+ return JSONResponse(error_body(request,status,"authentication_error",detail),status_code=status)

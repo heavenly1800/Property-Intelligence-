@@ -1,6 +1,7 @@
-from fastapi import APIRouter,HTTPException,Query
+from fastapi import APIRouter,HTTPException,Query,Request
 from app.infrastructure.database.notification_repository import NotificationRepository
 from app.services.notification_service import NotificationService
+from app.core.resilience import protected_operation
 router=APIRouter(tags=["Notifications"])
 
 @router.get("/notifications")
@@ -8,10 +9,10 @@ async def notifications(unread_only:bool=False,severity:str|None=None,notificati
 @router.get("/notifications/unread-count")
 async def unread_count():return {"unread_count":NotificationRepository.unread_count()}
 @router.post("/notifications/scan")
-async def scan_all():return NotificationService.scan_all()
+async def scan_all(request:Request):return protected_operation(request,"notification-scan",{},NotificationService.scan_all)
 @router.post("/properties/{property_id}/notifications/scan")
-async def scan_property(property_id:str):
- result=NotificationService.scan_property(property_id)
+async def scan_property(property_id:str,request:Request):
+ result=protected_operation(request,"notification-scan",{"property_id":property_id},lambda:NotificationService.scan_property(property_id))
  if not result:raise HTTPException(404,"Property was not found.")
  return result
 def status(notification_id,status):

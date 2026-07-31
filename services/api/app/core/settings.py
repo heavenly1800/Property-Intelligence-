@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -15,6 +16,23 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    APP_ENV: Literal["development", "test", "staging", "production"] = "development"
+    APP_VERSION: str = "0.1.0"
+    BUILD_ID: str = "local"
+    API_HOST: str = "127.0.0.1"
+    API_PORT: int = 8000
+    FRONTEND_ORIGINS: str = ""
+    TRUSTED_HOSTS: str = "127.0.0.1,localhost,testserver"
+    TRUST_PROXY_HEADERS: bool = False
+    DOCS_ENABLED: bool | None = None
+    LOG_LEVEL: str = "INFO"
+    AI_ANALYSIS_ENABLED: bool = True
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_REQUESTS: int = 10
+    RATE_LIMIT_WINDOW_SECONDS: int = 60
+    IDEMPOTENCY_RETENTION_SECONDS: int = 3600
+    SCANNER_BATCH_SIZE: int = 100
+    SCANNER_MODE: Literal["local", "oneshot"] = "local"
     RENTCAST_API_KEY: str = ""
     OPENAI_API_KEY: str = ""
     OPENAI_VISION_MODEL: str = "gpt-5.4-mini"
@@ -86,6 +104,65 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_ANON_KEY: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
+
+    @property
+    def is_deployed(self) -> bool:
+        return self.APP_ENV in {"staging", "production"}
+
+    @property
+    def docs_enabled(self) -> bool:
+        if self.DOCS_ENABLED is not None:
+            return self.DOCS_ENABLED
+        return self.APP_ENV in {"development", "test"}
+
+    @property
+    def frontend_origins(self) -> list[str]:
+        configured = [value.strip().rstrip("/") for value in self.FRONTEND_ORIGINS.split(",") if value.strip()]
+        if configured:
+            return configured
+        if self.APP_ENV in {"development", "test"}:
+            return ["http://localhost:5173", "http://127.0.0.1:5173"]
+        return []
+
+    @property
+    def trusted_hosts(self) -> list[str]:
+        return [value.strip() for value in self.TRUSTED_HOSTS.split(",") if value.strip()]
+
+    def validation_errors(self) -> list[str]:
+        required = {
+            "APP_ENV": self.APP_ENV,
+            "API_HOST": self.API_HOST,
+            "API_PORT": self.API_PORT,
+            "SUPABASE_URL": self.SUPABASE_URL,
+            "SUPABASE_ANON_KEY": self.SUPABASE_ANON_KEY,
+            "SUPABASE_SERVICE_ROLE_KEY": self.SUPABASE_SERVICE_ROLE_KEY,
+            "LOG_LEVEL": self.LOG_LEVEL,
+        }
+        if self.is_deployed:
+            required["FRONTEND_ORIGINS"] = self.FRONTEND_ORIGINS
+        if self.AI_ANALYSIS_ENABLED:
+            required["OPENAI_API_KEY"] = self.OPENAI_API_KEY
+        errors = [f"{name} is required." for name, value in required.items() if value is None or str(value).strip() == ""]
+        placeholders = ("your-", "replace-", "example", "changeme", "<", ">")
+        if self.is_deployed:
+            for name, value in required.items():
+                normalized = str(value).strip().lower()
+                if normalized and any(marker in normalized for marker in placeholders):
+                    errors.append(f"{name} contains a placeholder value.")
+            if any(origin == "*" for origin in self.frontend_origins):
+                errors.append("FRONTEND_ORIGINS cannot contain '*' when credentials are enabled.")
+            if self.COMMUNICATIONS_ENABLED and (self.EMAIL_PROVIDER == "console" or self.SMS_PROVIDER == "console"):
+                errors.append("Console communication providers cannot be enabled in staging or production.")
+        if self.NOTIFICATION_SCAN_INTERVAL_SECONDS < 1:
+            errors.append("NOTIFICATION_SCAN_INTERVAL_SECONDS must be positive.")
+        if self.SCANNER_BATCH_SIZE < 1:
+            errors.append("SCANNER_BATCH_SIZE must be positive.")
+        return errors
+
+    def validate_runtime(self) -> None:
+        errors = self.validation_errors()
+        if errors:
+            raise RuntimeError("Invalid application configuration: " + " ".join(errors))
 
 
 @lru_cache

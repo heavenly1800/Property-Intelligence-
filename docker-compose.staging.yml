@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./services/api
+    env_file: .env.staging
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./apps/web
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  scanner:
+    build:
+      context: ./services/api
+    env_file: .env.staging
+    command: ["python", "-m", "app.jobs.notification_scan", "--batch-size", "100"]
+    profiles: ["cron"]
+    restart: "no"

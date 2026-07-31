@@ -186,6 +186,13 @@ join through an invitation. The selected organization is sent in
 `X-Organization-ID` on API requests and is validated against the signed-in user's
 active membership.
 
+### Staging and production
+
+Deployment environment variables, containers, health checks, scanner cron,
+rollback guidance, RLS verification, and the security checklist are documented
+in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). Start from the committed example
+files; never copy backend service-role or OpenAI secrets into a `VITE_` variable.
+
 ---
 
 ## Mission

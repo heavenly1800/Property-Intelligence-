@@ -72,8 +72,10 @@ class NotificationService:
   candidates=cls.evaluate(prop,CrmRepository.list("tasks",property_id),CrmRepository.list("deadlines",property_id),CrmRepository.list("sent_offers",property_id),CrmRepository.list("contacts",property_id),CrmRepository.activities(property_id),now)
   return cls.reconcile(property_id,candidates)
  @classmethod
- def scan_all(cls,now=None):
-  results=[cls.scan_property(p["property_id"],now) for p in PropertyRepository.get_all()];return {"properties_scanned":len(results),"created":sum(x["created"] for x in results if x),"updated":sum(x["updated"] for x in results if x),"resolved":sum(x["resolved"] for x in results if x),"results":results}
+ def scan_all(cls,now=None,batch_size=None):
+  properties=PropertyRepository.get_all()
+  if batch_size:properties=properties[:batch_size]
+  results=[cls.scan_property(p["property_id"],now) for p in properties];return {"properties_scanned":len(results),"created":sum(x["created"] for x in results if x),"updated":sum(x["updated"] for x in results if x),"resolved":sum(x["resolved"] for x in results if x),"results":results}
  @staticmethod
  def set_status(notification_id,status):
   now=datetime.now(timezone.utc).isoformat();data={"status":status}

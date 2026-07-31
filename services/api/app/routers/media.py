@@ -1,9 +1,10 @@
-from fastapi import APIRouter, File, Query, UploadFile
+from fastapi import APIRouter, File, Query, UploadFile, Request
 from pydantic import BaseModel
 from app.infrastructure.database.property_media_repository import PropertyMediaRepository
 from app.services.property_media_service import PropertyMediaService
 from app.infrastructure.database.property_media_analysis_repository import PropertyMediaAnalysisRepository
 from app.services.vision_analysis_service import PropertyConditionAnalysisService
+from app.core.resilience import protected_operation_async
 
 router = APIRouter(prefix="/properties/{property_id}/media", tags=["Property Media"])
 class MediaUpdate(BaseModel): caption: str | None = None; room_category: str | None = None; source_url: str | None = None; sort_order: int | None = None
@@ -19,12 +20,16 @@ async def delete_media(property_id: str, media_id: str): PropertyMediaService.de
 async def primary_media(property_id: str, media_id: str): return PropertyMediaService.set_primary(property_id, media_id)
 
 @router.post("/{media_id}/analyze")
-async def analyze_media(property_id: str, media_id: str, reanalyze: bool = Query(False)):
-    return await PropertyConditionAnalysisService.analyze_media(property_id, media_id, reanalyze)
+async def analyze_media(property_id: str, media_id: str, request: Request, reanalyze: bool = Query(False)):
+    if not reanalyze:
+        return await PropertyConditionAnalysisService.analyze_media(property_id, media_id, reanalyze)
+    return await protected_operation_async(request, "ai-photo-reanalysis", {"property_id": property_id, "media_id": media_id, "reanalyze": True}, lambda: PropertyConditionAnalysisService.analyze_media(property_id, media_id, True))
 
 @router.post("/analyze-all")
-async def analyze_all_media(property_id: str, reanalyze: bool = Query(False)):
-    return await PropertyConditionAnalysisService.analyze_all(property_id, reanalyze)
+async def analyze_all_media(property_id: str, request: Request, reanalyze: bool = Query(False)):
+    if not reanalyze:
+        return await PropertyConditionAnalysisService.analyze_all(property_id, reanalyze)
+    return await protected_operation_async(request, "ai-photo-reanalysis", {"property_id": property_id, "reanalyze_all": True}, lambda: PropertyConditionAnalysisService.analyze_all(property_id, True))
 
 @router.get("/{media_id}/analysis")
 async def get_media_analysis(property_id: str, media_id: str):
