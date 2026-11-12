@@ -4,10 +4,23 @@ from pathlib import Path
 from app.infrastructure.database.property_repository import PropertyRepository
 from app.services.research.providers.models import ResearchResult
 
-# Add the decision-engine project to Python's import path
-decision_engine_path = (
-    Path(__file__).resolve().parents[3] / "decision-engine"
-)
+
+def _decision_engine_path(module_path: Path = Path(__file__)) -> Path:
+    """Locate the decision engine in repository and Docker layouts."""
+    resolved_path = module_path.resolve()
+
+    for parent_index in (2, 3):
+        candidate = resolved_path.parents[parent_index] / "decision-engine"
+
+        if candidate.is_dir():
+            return candidate
+
+    raise ModuleNotFoundError(
+        "The decision-engine package is missing from the API runtime."
+    )
+
+
+decision_engine_path = _decision_engine_path()
 
 if str(decision_engine_path) not in sys.path:
     sys.path.append(str(decision_engine_path))
