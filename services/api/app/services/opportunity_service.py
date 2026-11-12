@@ -5,28 +5,19 @@ class OpportunityService:
 
     @staticmethod
     def analyze(property_data: dict):
-
-        score = 50
-
-        property_type = property_data.get("property_type", "")
-
-        if property_type == "Vacant Land":
-            score += 30
-
-        strategy = (
-            "Wholesale"
-            if property_type == "Vacant Land"
-            else "Buy & Hold"
+        """Describe evaluation state without inventing a score or confidence."""
+        researched = property_data.get("research_quality_score") is not None
+        next_action = (
+            "Run Deal Strategy analysis."
+            if researched
+            else "Complete property research before evaluating the opportunity."
         )
-
-        confidence = 90
-
-        next_action = "Research Owner"
 
         return Opportunity(
             property_id=property_data.get("property_id"),
-            score=score,
-            strategy=strategy,
-            confidence=confidence,
+            score=None,
+            strategy=None,
+            confidence=None,
             next_action=next_action,
+            evaluation_status="not_evaluated",
         )

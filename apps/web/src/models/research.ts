@@ -20,4 +20,13 @@ export type ResearchResult = {
   progress: number;
   completed: boolean;
   confidence: number;
+  quality_summary: {
+    research_quality_score: number;
+    parcel_certainty: string;
+    assessment_coverage: string;
+    utility_confidence: string;
+    research_risk_level: string;
+    missing_research_items: string[];
+    recommended_research_action: string;
+  } | null;
 };

@@ -1,4 +1,4 @@
-from models import Buyer, BuyerMatchResult
+from models import BuyerMatchResult
 
 
 class BuyerEngine:
@@ -7,20 +7,5 @@ class BuyerEngine:
     """
 
     def find_buyers(self, property_data: dict) -> BuyerMatchResult:
-        result = BuyerMatchResult()
-
-        # Temporary placeholder.
-        # Real county transfer record providers will populate this.
-        result.buyers.append(
-            Buyer(
-                buyer_name="Sample Investment LLC",
-                purchase_count=12,
-                confidence=75,
-                reasons=[
-                    "Purchased multiple vacant land parcels.",
-                    "Active in the same county.",
-                ],
-            )
-        )
-
-        return result
+        # No verified buyer provider or repository is connected yet.
+        return BuyerMatchResult()

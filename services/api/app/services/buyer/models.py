@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -20,15 +20,15 @@ class BuyerScore(BaseModel):
 class BuyerMatch(BaseModel):
     buyer_name: str
 
-    score: BuyerScore
+    score: Optional[BuyerScore] = None
 
     strengths: List[str] = Field(default_factory=list)
     concerns: List[str] = Field(default_factory=list)
 
     recommendation: Optional[str] = None
 
-    purchase_count: int = 0
-    confidence: float = 0
+    purchase_count: Optional[int] = None
+    confidence: Optional[float] = None
 
 
 class BuyerMatchResult(BaseModel):
@@ -36,8 +36,13 @@ class BuyerMatchResult(BaseModel):
 
     recommended_buyer: Optional[BuyerMatch] = None
 
-    average_confidence: float = 0
+    average_confidence: Optional[float] = None
 
     market_demand: str = "Unknown"
+
+    status: Literal["verified_buyers_found", "no_verified_buyers"] = (
+        "no_verified_buyers"
+    )
+    message: str = "No verified buyers found."
 
     generated_at: datetime = Field(default_factory=datetime.utcnow)

@@ -9,12 +9,14 @@ export type DecisionResult = {
   /**
    * Opportunity score from 0–100.
    */
-  score: number;
+  score: number | null;
 
   /**
    * Confidence in the recommendation.
    */
-  confidence: number;
+  confidence: number | null;
+
+  evaluationStatus: "not_evaluated" | "evaluated";
 
   /**
    * BUY

@@ -4,9 +4,9 @@ from dataclasses import dataclass, field
 @dataclass
 class DealScore:
 
-    overall_score: float = 0.0
+    overall_score: float | None = None
 
-    confidence: float = 0.0
+    confidence: float | None = None
 
     market_value: float | None = None
 
@@ -16,7 +16,7 @@ class DealScore:
 
     strategy: str = ""
 
-    priority: str = ""
+    priority: str = "Not evaluated"
 
     strengths: list[str] = field(default_factory=list)
 

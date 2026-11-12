@@ -1,8 +1,17 @@
 import type { DecisionResult } from "../models/decision";
+import type { SentOffer } from "../types/crm";
+import type { OfferAnalysis } from "../types/offerAnalysis";
 import type { Property } from "../types/property";
 
-export type WorkflowStage = "research" | "buyers" | "offer" | "complete";
-export type WorkflowAction = "research" | "buyers" | "offer" | "complete";
+export type WorkflowStage = "research" | "buyers" | "offer" | "offer_sent";
+export type WorkflowAction = "research" | "buyers" | "offer" | "none";
+export type ResearchWorkflowStatus = "not_started" | "partial" | "complete";
+export type BuyerDiscoveryStatus =
+  | "not_searched"
+  | "no_verified_buyers"
+  | "verified_buyers_found"
+  | "failed";
+export type OfferWorkflowStatus = "unknown" | "not_created" | "blocked" | "prepared" | "sent";
 
 export type WorkflowState = {
   stage: WorkflowStage;
@@ -13,9 +22,12 @@ export type WorkflowState = {
   description: string;
   completedTasks: string[];
   canExecuteAction: boolean;
+  researchStatus: ResearchWorkflowStatus;
+  buyerStatus: BuyerDiscoveryStatus;
+  offerStatus: OfferWorkflowStatus;
 };
 
-export type BackendWorkflow = Partial<WorkflowState> & {
+export type BackendWorkflow = {
   stage?: WorkflowStage;
   next_action?: WorkflowAction;
   completed_tasks?: string[];
@@ -24,59 +36,83 @@ export type BackendWorkflow = Partial<WorkflowState> & {
 type WorkflowInput = {
   property: Property;
   decision: DecisionResult | null;
-  researchCompleted?: boolean;
-  buyersFound?: boolean;
+  buyerStatus: BuyerDiscoveryStatus;
+  offerAnalyses: OfferAnalysis[] | null;
+  sentOffers: SentOffer[] | null;
 };
 
-const workflowDefinitions: Record<WorkflowStage, Omit<WorkflowState, "description">> = {
-  research: {
-    stage: "research", progress: 25, nextAction: "research", nextActionLabel: "Run research",
-    title: "Complete property research", completedTasks: ["Property intake"], canExecuteAction: true,
-  },
-  buyers: {
-    stage: "buyers", progress: 50, nextAction: "buyers", nextActionLabel: "Find buyers",
-    title: "Identify qualified buyers", completedTasks: ["Property intake", "Property research"], canExecuteAction: true,
-  },
-  offer: {
-    stage: "offer", progress: 75, nextAction: "offer", nextActionLabel: "Generate offer",
-    title: "Prepare offer recommendation", completedTasks: ["Property intake", "Property research", "Buyer discovery"], canExecuteAction: false,
-  },
-  complete: {
-    stage: "complete", progress: 100, nextAction: "complete", nextActionLabel: "Workflow complete",
-    title: "Deal workflow complete", completedTasks: ["Property intake", "Property research", "Buyer discovery", "Offer recommendation"], canExecuteAction: false,
-  },
-};
-
-function getFallbackStage(input: WorkflowInput): WorkflowStage {
-  if (input.property.offer_amount != null) return "complete";
-  if (input.buyersFound || (input.property.buyer_count ?? 0) > 0) return "offer";
-  const researchComplete = input.researchCompleted
-    ?? input.property.research_completed
-    ?? (input.property.latitude != null && input.property.longitude != null);
-  return researchComplete ? "buyers" : "research";
+function researchStatus(property: Property): ResearchWorkflowStatus {
+  if (property.research_quality_score == null) return "not_started";
+  return property.missing_research_items?.length ? "partial" : "complete";
 }
 
-/**
- * Normalizes workflow data for the UI. A persisted backend workflow payload
- * takes precedence; the fallback is deliberately isolated for replacement by
- * a future workflow endpoint.
- */
-export function getWorkflowState(input: WorkflowInput): WorkflowState {
-  const backend = input.property.workflow;
-  const stage = backend?.stage ?? getFallbackStage(input);
-  const definition = workflowDefinitions[stage];
-  const action = backend?.next_action ?? backend?.nextAction ?? definition.nextAction;
+function offerStatus(
+  analyses: OfferAnalysis[] | null,
+  sentOffers: SentOffer[] | null,
+): OfferWorkflowStatus {
+  if (sentOffers?.length) return "sent";
+  if (analyses === null || sentOffers === null) return "unknown";
+  if (analyses.some((offer) => offer.recommended_offer != null && ["calculated", "manual"].includes(offer.offer_status))) return "prepared";
+  if (analyses.some((offer) => offer.offer_status === "blocked")) return "blocked";
+  return "not_created";
+}
 
-  return {
-    ...definition,
-    ...backend,
-    stage,
-    nextAction: action,
-    nextActionLabel: backend?.nextActionLabel ?? definition.nextActionLabel,
-    completedTasks: backend?.completed_tasks ?? backend?.completedTasks ?? definition.completedTasks,
-    description: input.decision?.reasons[0]
-      ?? input.decision?.nextAction
-      ?? input.property.next_action
-      ?? "Complete the recommended acquisition step to advance this deal.",
-  };
+export function getWorkflowState(input: WorkflowInput): WorkflowState {
+  const research = researchStatus(input.property);
+  const offer = offerStatus(input.offerAnalyses, input.sentOffers);
+  const buyer = input.buyerStatus;
+  const completedTasks = ["Property intake"];
+
+  if (research === "complete") completedTasks.push("Property research complete");
+  if (research === "partial") completedTasks.push("Partial property research saved");
+  if (buyer === "verified_buyers_found") completedTasks.push("Verified buyers found");
+  if (buyer === "no_verified_buyers") completedTasks.push("Buyer search completed: no verified buyers");
+  if (offer === "prepared" || offer === "sent") completedTasks.push("Offer analysis prepared");
+  if (offer === "sent") completedTasks.push("Offer recorded as sent");
+
+  if (offer === "sent") {
+    return state("offer_sent", 100, "none", "Offer recorded as sent", "Offer activity is persisted in sent-offer history.", false);
+  }
+  if (offer === "prepared") {
+    return state("offer", 75, "offer", "Review offer", "A persisted offer analysis is ready for review or sent-offer recording.", true);
+  }
+  if (offer === "blocked") {
+    return state("offer", 50, "offer", "Review blocked offer", "Offer analysis is persisted but blocked by missing or insufficient evidence.", true);
+  }
+  if (buyer === "verified_buyers_found") {
+    return state("buyers", 50, "offer", "Prepare offer", "Verified buyers were found in this session; no persisted offer exists yet.", true);
+  }
+  if (buyer === "no_verified_buyers") {
+    return state("buyers", 50, "buyers", "Search buyers again", "The latest search found no verified buyers. This search result is not persisted.", true);
+  }
+  if (buyer === "failed") {
+    return state("buyers", research === "not_started" ? 25 : 50, "buyers", "Retry buyer search", "Buyer discovery failed; no completion was recorded.", true);
+  }
+  if (research !== "not_started") {
+    return state("buyers", research === "complete" ? 50 : 25, "buyers", "Find verified buyers", "Research findings are persisted. Buyer search history is unavailable after refresh.", true);
+  }
+  return state("research", 25, "research", "Run research", input.decision?.nextAction ?? "No persisted research findings are available.", true);
+
+  function state(
+    stage: WorkflowStage,
+    progress: number,
+    nextAction: WorkflowAction,
+    title: string,
+    description: string,
+    canExecuteAction: boolean,
+  ): WorkflowState {
+    return {
+      stage,
+      progress,
+      nextAction,
+      nextActionLabel: title,
+      title,
+      description,
+      completedTasks,
+      canExecuteAction,
+      researchStatus: research,
+      buyerStatus: buyer,
+      offerStatus: offer,
+    };
+  }
 }

@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
+from app.core.auth import require_permission
+from app.services.buyer.models import BuyerMatchResult
 from app.services.buyer_service import BuyerService
 
 router = APIRouter(
@@ -8,9 +10,10 @@ router = APIRouter(
 )
 
 
-@router.get("/{property_id}")
+@router.get("/{property_id}", response_model=BuyerMatchResult)
 async def get_buyers(property_id: str):
-    result = BuyerService.find_buyers(property_id)
+    require_permission("analysis.read")
+    result = BuyerService().find_buyers(property_id)
 
     if result is None:
         raise HTTPException(
@@ -18,14 +21,4 @@ async def get_buyers(property_id: str):
             detail="Property not found.",
         )
 
-    return {
-        "buyers": [
-            {
-                "buyer_name": buyer.buyer_name,
-                "purchase_count": buyer.purchase_count,
-                "confidence": buyer.confidence,
-                "reasons": buyer.reasons,
-            }
-            for buyer in result.buyers
-        ]
-    }
+    return result

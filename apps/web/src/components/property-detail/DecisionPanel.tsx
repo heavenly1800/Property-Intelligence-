@@ -69,7 +69,7 @@ export default function DecisionPanel({
             fontWeight: 600,
           }}
         >
-          {workflow.stage.toUpperCase()}
+          {workflow.stage.replaceAll("_", " ").toUpperCase()} · {workflow.progress}%
         </div>
       </div>
 
@@ -82,18 +82,22 @@ export default function DecisionPanel({
         }}
       >
         <Metric
-          label="Opportunity Score"
-          value={decision.score}
+          label="Legacy Decision Score"
+          value={decision.score ?? "Not evaluated"}
         />
 
         <Metric
-          label="Confidence"
-          value={`${decision.confidence}%`}
+          label="Evidence Confidence"
+          value={decision.confidence == null ? "Insufficient data" : `${decision.confidence}%`}
         />
       </div>
 
       <Section title="Next Action">
         <p>{workflow.description}</p>
+
+        <p>
+          Research: {workflow.researchStatus.replaceAll("_", " ")} · Buyer discovery: {workflow.buyerStatus.replaceAll("_", " ")} · Offer: {workflow.offerStatus.replaceAll("_", " ")}
+        </p>
 
         {workflow.canExecuteAction && onAction && (
           <button
@@ -110,6 +114,10 @@ export default function DecisionPanel({
               : workflow.nextActionLabel}
           </button>
         )}
+      </Section>
+
+      <Section title="Persisted Progress">
+        <ul>{workflow.completedTasks.map((task) => <li key={task}>{task}</li>)}</ul>
       </Section>
 
       <Section title="Why This Property?">

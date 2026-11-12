@@ -14,6 +14,12 @@ class PropertyResponse(BaseModel):
 
     property_type: Optional[str] = None
 
+    opportunity_score: Optional[int] = None
+    confidence: Optional[int] = None
+    strategy: Optional[str] = None
+    next_action: Optional[str] = None
+    opportunity_evaluation_status: Optional[str] = None
+
     apn: Optional[str] = None
     acres: Optional[float] = None
     square_feet: Optional[int] = None

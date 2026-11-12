@@ -2,8 +2,8 @@ import type { Property } from "../../types/property";
 
 export default function DealMetrics({ property }: { property: Property }) {
   const metrics = [
-    ["Opportunity score", property.opportunity_score ?? "—"],
-    ["Decision confidence", property.confidence ? `${property.confidence}%` : "—"],
+    ["Opportunity evaluation", property.opportunity_score ?? "Not evaluated"],
+    ["Evidence confidence", property.confidence == null ? "Insufficient data" : `${property.confidence}%`],
     ["Parcel size", property.acres ? `${property.acres} ac` : "—"],
     ["Zoning", property.zoning ?? "Pending"],
   ];

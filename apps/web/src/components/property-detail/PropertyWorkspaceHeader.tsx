@@ -17,8 +17,8 @@ export default function PropertyWorkspaceHeader({ property }: PropertyWorkspaceH
         </div>
       </div>
       <div className="header-badges">
-        <span className="score-badge">Score {property.opportunity_score ?? "—"}</span>
-        <span className="stage-badge">{stage}</span>
+        <span className="score-badge">{property.opportunity_score == null ? "Not evaluated" : `Score ${property.opportunity_score}`}</span>
+        <span className="stage-badge">CRM: {stage}</span>
       </div>
     </header>
   );

@@ -1,23 +1,6 @@
 import { api } from "../lib/api";
 import { endpoints } from "../lib/endpoints";
 
-/**
- * Legacy buyer returned from the backend.
- * This stays here for compatibility while we migrate
- * to the Buyer Intelligence model.
- */
-export interface Buyer {
-    buyer_name: string;
-    purchase_count: number;
-    confidence: number;
-    reasons: string[];
-}
-
-/**
- * Detailed score returned by the Buyer Intelligence Engine.
- * These fields are optional for now so the UI remains compatible
- * with both legacy and new backend responses.
- */
 export interface BuyerScore {
     overall_score: number;
 
@@ -32,9 +15,9 @@ export interface BuyerScore {
 export interface BuyerMatch {
     buyer_name: string;
 
-    purchase_count: number;
+    purchase_count: number | null;
 
-    confidence: number;
+    confidence: number | null;
 
     score?: BuyerScore;
 
@@ -48,29 +31,23 @@ export interface BuyerMatch {
 export interface BuyerMatchResult {
     buyers: BuyerMatch[];
 
-    recommended_buyer?: BuyerMatch;
+    recommended_buyer: BuyerMatch | null;
 
-    average_confidence?: number;
+    average_confidence: number | null;
 
-    market_demand?: string;
-}
+    market_demand: string;
 
-/**
- * Current API contract.
- *
- * We intentionally keep this compatible with the existing backend.
- * When the backend begins returning BuyerMatchResult directly,
- * this interface can be simplified without affecting the rest of
- * the application.
- */
-export interface BuyerResponse {
-    buyers: BuyerMatch[];
+    status: "verified_buyers_found" | "no_verified_buyers";
+
+    message: string;
+
+    generated_at: string;
 }
 
 export function getBuyers(
     propertyId: string
 ) {
-    return api.get<BuyerResponse>(
+    return api.get<BuyerMatchResult>(
         endpoints.buyers(propertyId)
     );
 }

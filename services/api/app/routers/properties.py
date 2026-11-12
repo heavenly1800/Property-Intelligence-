@@ -24,7 +24,17 @@ async def get_property(property_id: str):
 
 @router.post("/")
 async def create_property(property: PropertyResponse):
-    return PropertyService.create(property.model_dump())
+    return PropertyService.create(
+        property.model_dump(
+            exclude={
+                "opportunity_score",
+                "confidence",
+                "strategy",
+                "next_action",
+                "opportunity_evaluation_status",
+            }
+        )
+    )
 
 
 @router.put("/{property_id}/financials", response_model=PropertyResponse)

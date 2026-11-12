@@ -24,10 +24,11 @@ export type Property = {
   property_type?: string;
 
   // Opportunity Engine
-  opportunity_score?: number;
-  confidence?: number;
+  opportunity_score?: number | null;
+  confidence?: number | null;
   strategy?: string;
   next_action?: string;
+  opportunity_evaluation_status?: "not_evaluated" | "evaluated";
 
   // Research Engine
   apn?: string;

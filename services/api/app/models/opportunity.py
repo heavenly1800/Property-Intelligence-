@@ -6,10 +6,12 @@ class Opportunity:
 
     property_id: str
 
-    score: int
+    score: int | None
 
-    strategy: str
+    strategy: str | None
 
-    confidence: int
+    confidence: int | None
 
     next_action: str
+
+    evaluation_status: str

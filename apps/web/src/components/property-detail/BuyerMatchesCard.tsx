@@ -1,19 +1,32 @@
-import type { BuyerMatch } from "../../services/buyerService";
+import type { BuyerMatch, BuyerMatchResult } from "../../services/buyerService";
+import type { BuyerDiscoveryStatus } from "../../services/workflowService";
 
 type Props = {
   buyers: BuyerMatch[];
+  result?: BuyerMatchResult | null;
+  status?: BuyerDiscoveryStatus;
+  error?: string | null;
 };
 
 export default function BuyerMatchesCard({
   buyers,
+  result,
+  status = "not_searched",
+  error = null,
 }: Props) {
   return (
     <section className="buyer-matches-card">
       <h2>Buyer Matches</h2>
 
+      {status === "failed" && <p className="media-error" role="alert">{error ?? "Buyer discovery failed."}</p>}
+
       {buyers.length === 0 ? (
         <p className="empty-buyer-state">
-          Click "Find Buyers" to search for matching investors.
+          {status === "no_verified_buyers" || result?.status === "no_verified_buyers"
+            ? "No verified buyers found."
+            : status === "failed"
+              ? "No buyer-search completion was recorded."
+              : 'Not searched in this session. Prior buyer-search history is unavailable.'}
         </p>
       ) : (
         <div className="buyer-list">
@@ -26,13 +39,9 @@ export default function BuyerMatchesCard({
                 {buyer.buyer_name}
               </h3>
 
-              <p>
-                Purchases: {buyer.purchase_count}
-              </p>
+              {buyer.purchase_count !== null && <p>Verified purchases: {buyer.purchase_count}</p>}
 
-              <p>
-                Confidence: {buyer.confidence}%
-              </p>
+              {buyer.confidence !== null && <p>Confidence: {buyer.confidence}%</p>}
 
               {buyer.recommendation && (
                 <p className="font-medium text-blue-600">

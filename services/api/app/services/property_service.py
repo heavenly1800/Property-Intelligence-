@@ -18,6 +18,7 @@ class PropertyService:
             property["strategy"] = opportunity.strategy
             property["confidence"] = opportunity.confidence
             property["next_action"] = opportunity.next_action
+            property["opportunity_evaluation_status"] = opportunity.evaluation_status
 
         return properties
 

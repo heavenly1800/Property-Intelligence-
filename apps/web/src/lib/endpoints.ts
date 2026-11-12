@@ -11,7 +11,7 @@ export const endpoints = {
         `/properties/${id}/listing-analysis`,
 
     research: (id: string) =>
-        `/research/${id}`,
+        `/research/${id}/run`,
 
     buyers: (id: string) =>
         `/buyers/${id}`,

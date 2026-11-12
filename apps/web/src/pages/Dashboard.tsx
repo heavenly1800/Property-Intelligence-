@@ -60,12 +60,12 @@ export default function Dashboard() {
 
             <StatCard
               title="Average Score"
-              value={stats.averageOpportunityScore}
+              value={stats.averageOpportunityScore ?? "Not evaluated"}
             />
 
             <StatCard
-              title="Ready to Offer"
-              value={stats.readyToOffer}
+              title="Evaluated Properties"
+              value={stats.evaluatedProperties}
             />
 
             <StatCard
@@ -77,7 +77,7 @@ export default function Dashboard() {
 
           <h2>Notification risks</h2><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}><StatCard title="Unread" value={unread}/><StatCard title="Deadlines at risk" value={notifications.filter(n=>n.notification_type.includes("deadline")).length}/><StatCard title="Expiring offers" value={notifications.filter(n=>n.notification_type==="offer_expiring").length}/><StatCard title="Stale leads" value={notifications.filter(n=>n.notification_type==="stale_lead").length}/></div>{notifications.slice(0,5).map(n=><p key={n.notification_id}><strong>{n.severity.toUpperCase()}:</strong> {n.title} · {n.property_id}</p>)}
 
-          <h2>Top Opportunities</h2>
+          <h2>Properties to Review</h2>
 
           {stats.topProperties.length === 0 ? (
             <p>No properties available.</p>

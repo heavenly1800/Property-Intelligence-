@@ -1,6 +1,7 @@
 import BuyerMatchesCard from "./BuyerMatchesCard";
 import type { Property } from "../../types/property";
-import type { BuyerMatch } from "../../services/buyerService";
+import type { BuyerMatch, BuyerMatchResult } from "../../services/buyerService";
+import type { BuyerDiscoveryStatus } from "../../services/workflowService";
 import type { ResearchResult } from "../../models/research";
 import ResearchStatusCard from "./ResearchStatusCard";
 import FinancialIntelligenceCard from "./FinancialIntelligenceCard";
@@ -13,7 +14,11 @@ import DealStrategySection from "./DealStrategySection";
 type OverviewTabProps = {
   property: Property;
   buyers: BuyerMatch[];
+  buyerResult: BuyerMatchResult | null;
+  buyerStatus: BuyerDiscoveryStatus;
+  buyerError: string | null;
   research: ResearchResult | null;
+  researchError: string | null;
   researching: boolean;
   loadingBuyers: boolean;
   onRunResearch: () => void;
@@ -25,7 +30,11 @@ type OverviewTabProps = {
 export default function OverviewTab({
   property,
   buyers,
+  buyerResult,
+  buyerStatus,
+  buyerError,
   research,
+  researchError,
   researching,
   loadingBuyers,
   onRunResearch,
@@ -41,7 +50,7 @@ export default function OverviewTab({
           disabled={researching}
           className="workspace-action primary"
         >
-          {researching ? "Running Research..." : "Run Research"}
+          {researching ? "Running Research..." : research || property.research_quality_score != null ? "Run Research Again" : "Run Research"}
         </button>
 
         <button
@@ -57,7 +66,7 @@ export default function OverviewTab({
         </button>
       </div>
 
-      <ResearchStatusCard research={research} />
+      <ResearchStatusCard research={research} property={property} loading={researching} error={researchError} />
 
       <FinancialIntelligenceCard property={property} onSaved={onRefreshProperty}>
         <AIConditionAnalysisCard propertyId={property.property_id} />
@@ -230,12 +239,12 @@ export default function OverviewTab({
       <section className="command-card overview-section">
         <h2>Acquisition Summary</h2>
 
-        <BuyerMatchesCard buyers={buyers} />
+        <BuyerMatchesCard buyers={buyers} result={buyerResult} status={buyerStatus} error={buyerError} />
 
         <div className="acquisition-summary">
           <Info
-            label="Opportunity Score"
-            value={property.opportunity_score}
+            label="Opportunity Evaluation"
+            value={property.opportunity_score ?? "Not evaluated"}
           />
 
           <Info

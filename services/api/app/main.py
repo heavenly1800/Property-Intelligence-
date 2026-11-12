@@ -27,7 +27,7 @@ from app.routers.research import router as research_router
 from app.routers.share_intake import router as share_intake_router
 from app.routers.strategy_analysis import router as strategy_analysis_router
 
-ROUTERS = [property_router, opportunity_router, intake_router, research_router, decision_router, media_router,
+ROUTERS = [property_router, opportunity_router, intake_router, research_router, decision_router, buyers_router, media_router,
            share_intake_router, repair_costs_router, comparables_router, strategy_analysis_router,
            offer_analysis_router, financing_router, crm_router, notifications_router, communications_router,
            auth_router]

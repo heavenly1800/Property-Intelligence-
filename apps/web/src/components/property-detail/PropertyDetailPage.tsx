@@ -22,18 +22,18 @@ const tabs: Tab[] = ["Overview", "Acquisition", "Research", "Buyers", "Offers", 
 export default function PropertyDetailPage() {
   const { property, loading, refresh } = useProperty();
   const [tab, setTab] = useState<Tab>("Overview");
-  const { workflow, decision, research, buyers, isExecuting, executeNextAction, runResearch, findBuyers } = useWorkflow({ property, refreshProperty: refresh });
+  const { workflow, decision, research, researchError, buyers, buyerResult, buyerStatus, buyerError, isExecuting, isResearching, isFindingBuyers, executeNextAction, runResearch, findBuyers, refreshWorkflowActivity } = useWorkflow({ property, refreshProperty: refresh });
 
   if (loading) return <div className="workspace-loading">Loading property workspace…</div>;
   if (!property) return <div className="workspace-loading">Property not found.</div>;
   const currentProperty = property;
 
   function renderTab() {
-    if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} research={research} researching={isExecuting} loadingBuyers={isExecuting} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} onGenerateOffer={() => setTab("Offers")} />;
+    if (tab === "Overview") return <OverviewTab property={currentProperty} buyers={buyers} buyerResult={buyerResult} buyerStatus={buyerStatus} buyerError={buyerError} research={research} researchError={researchError} researching={isResearching} loadingBuyers={isFindingBuyers} onRunResearch={runResearch} onFindBuyers={findBuyers} onRefreshProperty={refresh} onGenerateOffer={() => setTab("Offers")} />;
     if (tab === "Acquisition") return <><PropertyNotifications propertyId={currentProperty.property_id} /><AcquisitionCrmSection propertyId={currentProperty.property_id} onStageChange={refresh} /><CommunicationsSection propertyId={currentProperty.property_id} address={currentProperty.address} /></>;
-    if (tab === "Research") return <ResearchStatusCard research={research} />;
-    if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} />;
-    if (tab === "Offers") return <><OfferCalculatorSection propertyId={currentProperty.property_id} /><SentOfferRecorder propertyId={currentProperty.property_id} /></>;
+    if (tab === "Research") return <ResearchStatusCard research={research} property={currentProperty} loading={isResearching} error={researchError} />;
+    if (tab === "Buyers") return <BuyerMatchesCard buyers={buyers} result={buyerResult} status={buyerStatus} error={buyerError} />;
+    if (tab === "Offers") return <><OfferCalculatorSection propertyId={currentProperty.property_id} onActivityChange={refreshWorkflowActivity} /><SentOfferRecorder propertyId={currentProperty.property_id} onActivityChange={refreshWorkflowActivity} /></>;
     if (tab === "Financing") return <FinancingSection propertyId={currentProperty.property_id} />;
     return <section className="command-card empty-workspace"><p className="eyebrow">{tab}</p><h2>{tab} workspace</h2><p>This workspace is ready for your team’s {tab.toLowerCase()} activity.</p></section>;
   }
@@ -43,7 +43,7 @@ export default function PropertyDetailPage() {
       <PropertyWorkspaceHeader property={currentProperty} />
       <div className="workspace-grid">
         <div className="workspace-primary">
-          {workflow && decision && <DecisionPanel decision={decision} workflow={workflow} loading={isExecuting} onAction={executeNextAction} />}
+          {workflow && decision && <DecisionPanel decision={decision} workflow={workflow} loading={isExecuting} onAction={() => workflow.nextAction === "offer" ? setTab("Offers") : void executeNextAction()} />}
           <DealMetrics property={currentProperty} />
           <section className="tabbed-workspace">
             <div className="tab-list" role="tablist">{tabs.map((name) => <button key={name} role="tab" aria-selected={tab === name} className={tab === name ? "active" : ""} onClick={() => setTab(name)}>{name}</button>)}</div>
@@ -53,7 +53,7 @@ export default function PropertyDetailPage() {
         <aside className="workspace-sidebar">
           <section className="command-card ai-summary"><p className="eyebrow">AI brief</p><h2>Acquisition Summary</h2><p>{decision?.reasons[0] ?? "Run the decision engine to generate an acquisition brief for this property."}</p><p className="next-action">Next: {decision?.nextAction ?? property.next_action ?? "Review property details"}</p></section>
           <section className="command-card facts-card"><p className="eyebrow">At a glance</p><h2>Quick Property Facts</h2><dl><div><dt>Owner</dt><dd>{property.owner_name ?? "Pending research"}</dd></div><div><dt>Size</dt><dd>{property.square_feet ? `${property.square_feet.toLocaleString()} sq ft` : "—"}</dd></div><div><dt>Zoning</dt><dd>{property.zoning ?? "Pending research"}</dd></div><div><dt>Strategy</dt><dd>{property.strategy ?? "Under review"}</dd></div></dl></section>
-          <ResearchStatusCard research={research} compact />
+          <ResearchStatusCard research={research} property={currentProperty} loading={isResearching} error={researchError} compact />
         </aside>
       </div>
     </main>

@@ -43,24 +43,20 @@ export default function PropertyCard({
         <hr />
 
         <h3>
-          Opportunity Score
+          Opportunity Evaluation
         </h3>
 
         <h1>
-          {property.opportunity_score ?? "--"}
+          {property.opportunity_score ?? "Not evaluated"}
         </h1>
 
         <p>
           Strategy:
           {" "}
-          {property.strategy ?? "Pending"}
+          {property.strategy ?? "Use Deal Strategy analysis"}
         </p>
 
-        <p>
-          Confidence:
-          {" "}
-          {property.confidence ?? "--"}%
-        </p>
+        <p>Evidence confidence: {property.confidence == null ? "Insufficient data" : `${property.confidence}%`}</p>
 
         <p>
           Next Action:

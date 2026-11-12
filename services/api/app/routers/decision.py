@@ -21,6 +21,7 @@ async def evaluate_property(property_id: str):
     return {
         "score": result.score,
         "confidence": result.confidence,
+        "evaluation_status": result.evaluation_status,
         "reasons": result.reasons,
         "risks": result.risks,
         "next_action": result.next_action,

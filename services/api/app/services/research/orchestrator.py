@@ -22,7 +22,14 @@ class ResearchAggregator:
                 results.append(provider_result)
 
                 if provider_result.status == ResearchProviderStatus.COMPLETED:
-                    working_property.update(provider_result.data)
+                    working_property.update(
+                        {
+                            key: value
+                            for key, value in provider_result.data.items()
+                            if value is not None
+                            and (not isinstance(value, str) or value.strip())
+                        }
+                    )
             except Exception as error:
                 results.append(
                     ResearchProviderResult(

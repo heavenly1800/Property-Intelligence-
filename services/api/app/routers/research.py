@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
+from app.core.auth import require_permission
 from app.services.research.service import ResearchService
 from app.services.research.providers.models import ResearchResult
 
@@ -11,6 +12,7 @@ router = APIRouter(
 
 @router.post("/{property_id}/run", response_model=ResearchResult)
 async def run_research(property_id: str):
+    require_permission("analysis.manage")
     result = await ResearchService.run(property_id)
 
     if result is None:

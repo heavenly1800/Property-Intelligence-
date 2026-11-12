@@ -1,15 +1,9 @@
 from __future__ import annotations
 
-from statistics import mean
-
 from app.infrastructure.database.property_repository import PropertyRepository
 
 from app.services.buyer.engine import BuyerEngine
-from app.services.buyer.models import (
-    BuyerMatch,
-    BuyerMatchResult,
-)
-from app.services.buyer.scoring import score_buyer
+from app.services.buyer.models import BuyerMatchResult
 
 
 class BuyerService:
@@ -29,110 +23,39 @@ class BuyerService:
         self.repository = PropertyRepository()
         self.engine = BuyerEngine()
 
-    def get_matches(
+    def find_buyers(
         self,
         property_id: str,
-    ) -> BuyerMatchResult:
+    ) -> BuyerMatchResult | None:
 
         property_data = self.repository.get(property_id)
 
+        if property_data is None:
+            return None
+
         raw_buyers = self.engine.find_buyers(property_data)
 
-        matches: list[BuyerMatch] = []
+        if not raw_buyers:
+            return BuyerMatchResult()
 
-        for buyer in raw_buyers:
-
-            score = score_buyer(
-                buyer,
-                property_data,
-            )
-
-            strengths = []
-            concerns = []
-
-            if score.distance_score >= 80:
-                strengths.append(
-                    "Strong purchasing activity near this property."
-                )
-
-            if score.county_score >= 80:
-                strengths.append(
-                    "Frequently purchases properties in this county."
-                )
-
-            if score.purchase_frequency_score >= 80:
-                strengths.append(
-                    "High volume repeat buyer."
-                )
-
-            if score.purchase_frequency_score < 50:
-                concerns.append(
-                    "Limited purchase history."
-                )
-
-            if score.recency_score < 50:
-                concerns.append(
-                    "No recent acquisition activity."
-                )
-
-            recommendation = (
-                "Contact First"
-                if score.overall_score >= 85
-                else "Strong Candidate"
-                if score.overall_score >= 70
-                else "Secondary Prospect"
-            )
-
-            matches.append(
-                BuyerMatch(
-                    buyer_name=buyer["buyer_name"],
-                    purchase_count=buyer.get(
-                        "purchase_count",
-                        0,
-                    ),
-                    confidence=buyer.get(
-                        "confidence",
-                        score.overall_score,
-                    ),
-                    score=score,
-                    strengths=strengths,
-                    concerns=concerns,
-                    recommendation=recommendation,
-                )
-            )
-
-        matches.sort(
-            key=lambda m: m.score.overall_score,
-            reverse=True,
-        )
-
+        confidences = [
+            buyer.confidence
+            for buyer in raw_buyers
+            if buyer.confidence is not None
+        ]
         average = (
-            mean(
-                [
-                    m.score.overall_score
-                    for m in matches
-                ]
-            )
-            if matches
-            else 0
-        )
-
-        demand = (
-            "High"
-            if average >= 80
-            else "Moderate"
-            if average >= 60
-            else "Low"
+            round(sum(confidences) / len(confidences), 1)
+            if confidences
+            else None
         )
 
         return BuyerMatchResult(
-            buyers=matches,
-            recommended_buyer=matches[0]
-            if matches
-            else None,
-            average_confidence=round(
-                average,
-                1,
-            ),
-            market_demand=demand,
+            buyers=raw_buyers,
+            average_confidence=average,
+            status="verified_buyers_found",
+            message="Verified buyers found.",
         )
+
+    def get_matches(self, property_id: str) -> BuyerMatchResult | None:
+        """Compatibility entry point for existing strategy analysis code."""
+        return self.find_buyers(property_id)
