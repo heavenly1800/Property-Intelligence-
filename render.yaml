@@ -8,8 +8,7 @@ services:
     branch: staging
     autoDeployTrigger: checksPass
     dockerfilePath: ./services/api/Dockerfile
-    dockerCommand: >-
-      sh -c 'python -m uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --no-proxy-headers'
+    dockerCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT --no-proxy-headers
     healthCheckPath: /health/ready
     envVars:
       - key: APP_ENV
